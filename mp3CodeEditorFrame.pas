@@ -117,6 +117,7 @@ type
     procedure SetHistoryTabVisibility(AValue: boolean);
     function GetWordAtCursor: string;
     function GetCurrentHistoricalVersion: integer;
+    property SynEdit: TSynEdit read FSynEdit;
     property Content: string
       read GetContent write SetContent;
     property OnPreprocess: TNotifyEvent

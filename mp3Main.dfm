@@ -239,6 +239,14 @@ object mp3MainForm: Tmp3MainForm
       ShortCut = 16449
       OnExecute = actSelectAllExecute
     end
+    object FormatSeparator: TAction
+      Caption = '-'
+    end
+    object actFormatSourceCode: TAction
+      Caption = '&Format Source Code'
+      ShortCut = 16452
+      OnExecute = actFormatSourceCodeExecute
+    end
   end
   object al_actView: TActionList
     Images = ilMain

@@ -18,6 +18,7 @@ uses
   OtlTask, OtlTaskControl, OtlEventMonitor, OtlComm,
   tuiItemWithLocationDialog, tuiItemWithSizeDialog,
   SpTBXMessageDlg, SpTBXInputBox,
+  sitDelforObjectPascalFormatter,
   sitGenericMainForm,
   sitCompilerMessagesPanel,
   sitEditorFrame,
@@ -175,6 +176,8 @@ type
     FullScreenSeparator: TAction;
     al_actLanguage: TActionList;
     actCheckForUpdates: TAction;
+    FormatSeparator: TAction;
+    actFormatSourceCode: TAction;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -199,6 +202,7 @@ type
     procedure actCloseProjectExecute(Sender: TObject);
     procedure actSaveProjectExecute(Sender: TObject);
     procedure actCloseAllFilesExecute(Sender: TObject);
+    procedure actFormatSourceCodeExecute(Sender: TObject);
     procedure actUndoExecute(Sender: TObject);
     procedure actRedoExecute(Sender: TObject);
     procedure actCompileCurrentFileExecute(Sender: TObject);
@@ -885,6 +889,32 @@ procedure Tmp3MainForm.actFindTextExecute(Sender: TObject);
 begin
   if Assigned(FMainFrame.CurrentEditor)and(FMainFrame.CurrentEditor.Kind=ekCode) then
     Tmp3CodeEditorFrame(FMainFrame.CurrentEditor).ShowFindDialog;
+end;
+
+procedure Tmp3MainForm.actFormatSourceCodeExecute(Sender: TObject);
+
+  function GetSourceCodeToFormat: widestring;
+  begin
+    with Tmp3CodeEditorFrame(FMainFrame.CurrentEditor).SynEdit do begin
+      if SelText = '' then
+        SelectAll;
+      result := SelText;
+    end;
+  end;
+
+var s: widestring;
+begin
+  if assigned(FMainFrame.CurrentEditor) then
+    if MessageDlg(_('Are you sure you want to format it?'),
+      mtConfirmation, mbYesNo, 0) = mrYes then
+      with TsitDelforObjectPascalFormatter.Create do
+      try
+        s := Format(GetSourceCodeToFormat);
+        if s <> '' then
+          Tmp3CodeEditorFrame(FMainFrame.CurrentEditor).SynEdit.SelText := s;
+      finally
+        Free;
+      end;
 end;
 
 procedure Tmp3MainForm.actFindNextExecute(Sender: TObject);

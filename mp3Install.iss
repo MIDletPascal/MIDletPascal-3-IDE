@@ -1,9 +1,9 @@
 [Setup]
 AppCopyright=Copyright by MIDletPascal project
-AppName=MIDletPascal 3.0
-AppVerName=MIDletPascal 3.0
-DefaultDirName={pf}\MIDletPascal 3.0
-DefaultGroupName=MIDletPascal 3.0
+AppName=MIDletPascal 3.1 ALPHA
+AppVerName=MIDletPascal 3.1 ALPHA
+DefaultDirName={pf}\MIDletPascal 3.1 ALPHA
+DefaultGroupName=MIDletPascal 3.1 ALPHA
 ShowLanguageDialog=yes
 AppID={{03CC75C8-4327-46F0-A248-C859D063DCE6}
 UninstallDisplayIcon={app}\mp3IDE.exe
@@ -36,19 +36,20 @@ Source: LICENSE.txt; DestDir: {app}; DestName: mp3IDE-LICENSE.txt
 Source: bin\LICENSE.txt; DestDir: {app}
 Source: bin\README.txt; DestDir: {app}; Flags: isreadme
 Source: bin\Stubs\*.class; DestDir: {app}\Stubs\
-Source: bin\Locale\*; DestDir: {app}\Locale\; Flags: recursesubdirs createallsubdirs; Excludes: "*.po"
+Source: default.po; DestDir: {app}\Locale\
+Source: bin\Locale\*; DestDir: {app}\Locale\; Flags: recursesubdirs createallsubdirs
 Source: bin\Help\*; DestDir: {app}\Help\; Flags: recursesubdirs createallsubdirs
 Source: bin\Libs\Lib_rsenum.class; DestDir: {app}\Libs\
 Source: bin\Libs\Lib_rsenum.java; DestDir: {app}\Libs\
 Source: bin\Demos\*; DestDir: {commondocs}\MIDletPascal\Demos\; Flags: recursesubdirs createallsubdirs
 
 [Icons]
-Name: {group}\MIDletPascal 3.0; Filename: {app}\mp3IDE.exe; WorkingDir: {app}; IconFilename: {app}\mp3IDE.exe; IconIndex: 0
-Name: {group}\MIDletPascal 3.0 Demos; Filename: {commondocs}\MIDletPascal\Demos\
-Name: {group}\MIDletPascal 3.0 Help; Filename: {app}\Help\en\Index.htm
-Name: {group}\MIDletPascal 3.0 Readme; Filename: {app}\README.txt
-Name: {group}\MIDletPascal 3.0 History; Filename: {app}\HISTORY.txt
-Name: {group}\MIDletPascal 3.0 License; Filename: {app}\LICENSE.txt
+Name: {group}\MIDletPascal 3.1 ALPHA; Filename: {app}\mp3IDE.exe; WorkingDir: {app}; IconFilename: {app}\mp3IDE.exe; IconIndex: 0
+Name: {group}\MIDletPascal 3.1 ALPHA Demos; Filename: {commondocs}\MIDletPascal\Demos\
+Name: {group}\MIDletPascal 3.1 ALPHA Help; Filename: {app}\Help\en\Index.htm
+Name: {group}\MIDletPascal 3.1 ALPHA Readme; Filename: {app}\README.txt
+Name: {group}\MIDletPascal 3.1 ALPHA History; Filename: {app}\HISTORY.txt
+Name: {group}\MIDletPascal 3.1 ALPHA License; Filename: {app}\LICENSE.txt
 
 [Registry]
 Root: HKCR; Subkey: ".mpsrc"; ValueType: "string"; ValueData: "MidletPascal.Source"
