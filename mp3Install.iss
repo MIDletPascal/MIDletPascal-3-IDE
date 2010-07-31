@@ -1,9 +1,9 @@
 [Setup]
 AppCopyright=Copyright by MIDletPascal project
-AppName=MIDletPascal 3.1 ALPHA
-AppVerName=MIDletPascal 3.1 ALPHA
-DefaultDirName={pf}\MIDletPascal 3.1 ALPHA
-DefaultGroupName=MIDletPascal 3.1 ALPHA
+AppName=MIDletPascal 3.1 BETA
+AppVerName=MIDletPascal 3.1 BETA
+DefaultDirName={pf}\MIDletPascal 3.1 BETA
+DefaultGroupName=MIDletPascal 3.1 BETA
 ShowLanguageDialog=yes
 AppID={{03CC75C8-4327-46F0-A248-C859D063DCE6}
 UninstallDisplayIcon={app}\mp3IDE.exe
@@ -36,6 +36,7 @@ Source: LICENSE.txt; DestDir: {app}; DestName: mp3IDE-LICENSE.txt
 Source: bin\LICENSE.txt; DestDir: {app}
 Source: bin\README.txt; DestDir: {app}; Flags: isreadme
 Source: bin\Stubs\*.class; DestDir: {app}\Stubs\
+Source: bin\Styles\*.ces; DestDir: {app}\Styles\
 Source: default.po; DestDir: {app}\Locale\
 Source: bin\Locale\*; DestDir: {app}\Locale\; Flags: recursesubdirs createallsubdirs
 Source: bin\Help\*; DestDir: {app}\Help\; Flags: recursesubdirs createallsubdirs
@@ -44,12 +45,12 @@ Source: bin\Libs\Lib_rsenum.java; DestDir: {app}\Libs\
 Source: bin\Demos\*; DestDir: {commondocs}\MIDletPascal\Demos\; Flags: recursesubdirs createallsubdirs
 
 [Icons]
-Name: {group}\MIDletPascal 3.1 ALPHA; Filename: {app}\mp3IDE.exe; WorkingDir: {app}; IconFilename: {app}\mp3IDE.exe; IconIndex: 0
-Name: {group}\MIDletPascal 3.1 ALPHA Demos; Filename: {commondocs}\MIDletPascal\Demos\
-Name: {group}\MIDletPascal 3.1 ALPHA Help; Filename: {app}\Help\en\Index.htm
-Name: {group}\MIDletPascal 3.1 ALPHA Readme; Filename: {app}\README.txt
-Name: {group}\MIDletPascal 3.1 ALPHA History; Filename: {app}\HISTORY.txt
-Name: {group}\MIDletPascal 3.1 ALPHA License; Filename: {app}\LICENSE.txt
+Name: {group}\MIDletPascal 3.1 BETA; Filename: {app}\mp3IDE.exe; WorkingDir: {app}; IconFilename: {app}\mp3IDE.exe; IconIndex: 0
+Name: {group}\MIDletPascal 3.1 BETA Demos; Filename: {commondocs}\MIDletPascal\Demos\
+Name: {group}\MIDletPascal 3.1 BETA Help; Filename: {app}\Help\en\Index.htm
+Name: {group}\MIDletPascal 3.1 BETA Readme; Filename: {app}\README.txt
+Name: {group}\MIDletPascal 3.1 BETA History; Filename: {app}\HISTORY.txt
+Name: {group}\MIDletPascal 3.1 BETA License; Filename: {app}\LICENSE.txt
 
 [Registry]
 Root: HKCR; Subkey: ".mpsrc"; ValueType: "string"; ValueData: "MidletPascal.Source"

@@ -1167,22 +1167,6 @@ object mp3MainForm: Tmp3MainForm
   object al_actCodeEditorStyle: TActionList
     Left = 168
     Top = 72
-    object actMidletStyle: TAction
-      Caption = 'Midlet'
-      Checked = True
-      OnExecute = actMidletStyleExecute
-    end
-    object actClassicStyle: TAction
-      Caption = 'Classic'
-      OnExecute = actClassicStyleExecute
-    end
-    object FontSeparator: TAction
-      Caption = '-'
-    end
-    object actSetFont: TAction
-      Caption = 'Set &Font'
-      OnExecute = actSetFontExecute
-    end
   end
   object alPMSourceFiles: TActionList
     Left = 328

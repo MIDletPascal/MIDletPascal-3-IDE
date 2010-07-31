@@ -23,7 +23,7 @@ uses
   SynEditHighlighter,
   gnugettext,
   tuiFindDialog, tuiReplaceDialog,  
-  sitEditorFrame,
+  sitEditorFrame, sitSynCodeEditorStyle, sitSynCodeEditorStylePas,
   mp3FileKind, mp3Consts, mp3Settings;
 
 type
@@ -328,7 +328,7 @@ begin
   InitCodeTab;
   InitPreprocessTab;
   InitHistoryTab;
-  SetColorSpeedSetting('Midlet');
+  SetColorSpeedSetting(gSettings.CodeEditorStyle);
   FCodeTab.Click;
   OnResize := WhenResizing;
 end;
@@ -707,99 +707,39 @@ end;
 
 procedure Tmp3CodeEditorFrame.SetColorSpeedSetting(AColorSetting: string);
 
-  procedure SetGutter(ATextColor: TColor; ABorderStyle: TSynGutterBorderStyle;
-    ABorderColor: TColor; AGradientStartColor, AGradientEndColor: TColor);
+  procedure SetStringGridPreferences(AStringGrid: TStringGrid);
   begin
-    FSynEdit.Gutter.Font.Color := ATextColor;
-    FSynEdit.Gutter.BorderStyle := ABorderStyle;
-    FSynEdit.Gutter.BorderColor := ABorderColor;
-    FSynEdit.Gutter.GradientStartColor := AGradientStartColor;
-    FSynEdit.Gutter.GradientEndColor := AGradientEndColor;
-  end;
-
-  procedure SetAttrs(AAttrs: TSynHighlighterAttributes;
-    AFontStyles: TFontStyles; AFGColor, ABGColor: TColor);
-  begin
-    AAttrs.Style := AFontStyles;
-    AAttrs.Background := ABGColor;
-    AAttrs.Foreground := AFGColor;
-  end;
-
-  procedure SetPreferences(ASynEdit: TSynEdit);
-  begin
-    ASynEdit.Color := FSynEdit.Color;
-    ASynEdit.Font.Assign(FSynEdit.Font);
-    ASynEdit.SelectedColor.Assign(FSynEdit.SelectedColor);
-    ASynEdit.Highlighter := FSynEdit.Highlighter;
-    ASynEdit.Gutter.Assign(FSynEdit.Gutter);
-  end;
-
-  procedure SetGridPreferences(AStringGrid: TStringGrid);
-  begin
-    AStringGrid.Font.Assign(FSynEdit.Font);
-    AStringGrid.Canvas.Font.Assign(FSynEdit.Font);
-    AStringGrid.ColWidths[0] := FSynEdit.Gutter.Width;
-    AStringGrid.Color := FSynEdit.Color;
+    AStringGrid.Font.Assign(SynEdit.Font);
+    AStringGrid.Canvas.Font.Assign(SynEdit.Font);
+    AStringGrid.ColWidths[0] := SynEdit.Gutter.Width;
+    AStringGrid.Color := SynEdit.Color;
     AStringGrid.Font.Color :=
-      FSynEdit.Highlighter.IdentifierAttribute.Foreground;
+      SynEdit.Highlighter.IdentifierAttribute.Foreground;
     AStringGrid.Canvas.Font.Color :=
-      FSynEdit.Highlighter.IdentifierAttribute.Foreground;
+      SynEdit.Highlighter.IdentifierAttribute.Foreground;
   end;
 
+var s: string;
 begin
-  if AColorSetting = CODE_EDITOR_STYLE_CLASSIC then begin
-    with TSynPasSyn(FSynEdit.Highlighter) do begin
-      FSynEdit.Color := CODE_EDITOR_STYLE_CLASSIC_BG;
-      FSynEdit.SelectedColor.Foreground := CODE_EDITOR_STYLE_CLASSIC_SELECTED_FG;
-      FSynEdit.SelectedColor.Background := CODE_EDITOR_STYLE_CLASSIC_SELECTED_BG;
-      FSynEdit.ActiveLineColor := CODE_EDITOR_STYLE_CLASSIC_BG;
-      SetAttrs(IdentifierAttri,[],CODE_EDITOR_STYLE_CLASSIC_FG,CODE_EDITOR_STYLE_CLASSIC_BG);
-      SetAttrs(AsmAttri,[],CODE_EDITOR_STYLE_CLASSIC_FG,CODE_EDITOR_STYLE_CLASSIC_BG);
-      SetAttrs(StringAttri,[],CODE_EDITOR_STYLE_CLASSIC_FG,CODE_EDITOR_STYLE_CLASSIC_BG);
-      SetAttrs(SymbolAttri,[],CODE_EDITOR_STYLE_CLASSIC_SYMBOL_FG,CODE_EDITOR_STYLE_CLASSIC_SYMBOL_BG);
-      SetAttrs(KeyAttri,[],CODE_EDITOR_STYLE_CLASSIC_KEYWORD_FG,CODE_EDITOR_STYLE_CLASSIC_KEYWORD_BG);
-      SetAttrs(CommentAttri,[],CODE_EDITOR_STYLE_CLASSIC_COMMENT_FG,CODE_EDITOR_STYLE_CLASSIC_COMMENT_BG);
-      SetAttrs(DirectiveAttri,[],CODE_EDITOR_STYLE_CLASSIC_DIRECTIVE_FG,CODE_EDITOR_STYLE_CLASSIC_DIRECTIVE_BG);
-      SetAttrs(NumberAttri,[],CODE_EDITOR_STYLE_CLASSIC_FG,CODE_EDITOR_STYLE_CLASSIC_BG);
-      SetAttrs(FloatAttri,[],CODE_EDITOR_STYLE_CLASSIC_FG,CODE_EDITOR_STYLE_CLASSIC_BG);
-      SetAttrs(HexAttri,[],CODE_EDITOR_STYLE_CLASSIC_FG,CODE_EDITOR_STYLE_CLASSIC_BG);
-      SetAttrs(CharAttri,[],CODE_EDITOR_STYLE_CLASSIC_FG,CODE_EDITOR_STYLE_CLASSIC_BG);
-    end;
-    SetGutter(clSilver,gbsRight,clSilver,clNavy,clNavy);
+  s := gSettings.AppPath+'Styles\'+AColorSetting+'.ces';
+  if (AColorSetting = CODE_EDITOR_STYLE_CLASSIC) or not FileExists(s) then begin
+    SetPascalCodeEditorStandardStyle(FSynEdit);
     FDiffModifyColor := CODE_EDITOR_STYLE_CLASSIC_DIFF_MOD;
     FDiffDeleteColor := CODE_EDITOR_STYLE_CLASSIC_DIFF_DEL;
     FDiffAddColor := CODE_EDITOR_STYLE_CLASSIC_DIFF_ADD;
-  end else begin // 'Midlet'
-    with TSynPasSyn(FSynEdit.Highlighter) do begin
-      FSynEdit.Color := CODE_EDITOR_STYLE_MIDLET_BG;
-      FSynEdit.SelectedColor.Foreground := CODE_EDITOR_STYLE_MIDLET_SELECTED_FG;
-      FSynEdit.SelectedColor.Background := CODE_EDITOR_STYLE_MIDLET_SELECTED_BG;
-      FSynEdit.ActiveLineColor := CODE_EDITOR_STYLE_MIDLET_BG;
-      SetAttrs(IdentifierAttri,[],CODE_EDITOR_STYLE_MIDLET_FG,CODE_EDITOR_STYLE_MIDLET_BG);
-      SetAttrs(AsmAttri,[],CODE_EDITOR_STYLE_MIDLET_FG,CODE_EDITOR_STYLE_MIDLET_BG);
-      SetAttrs(StringAttri,[],CODE_EDITOR_STYLE_MIDLET_FG,CODE_EDITOR_STYLE_MIDLET_BG);
-      SetAttrs(SymbolAttri,[],CODE_EDITOR_STYLE_MIDLET_SYMBOL_FG,CODE_EDITOR_STYLE_MIDLET_SYMBOL_BG);
-      SetAttrs(KeyAttri,[fsBold],CODE_EDITOR_STYLE_MIDLET_KEYWORD_FG,CODE_EDITOR_STYLE_MIDLET_KEYWORD_BG);
-      SetAttrs(CommentAttri,[],CODE_EDITOR_STYLE_MIDLET_COMMENT_FG,CODE_EDITOR_STYLE_MIDLET_COMMENT_BG);
-      SetAttrs(DirectiveAttri,[],CODE_EDITOR_STYLE_MIDLET_DIRECTIVE_FG,CODE_EDITOR_STYLE_MIDLET_DIRECTIVE_BG);
-      SetAttrs(NumberAttri,[],CODE_EDITOR_STYLE_MIDLET_FG,CODE_EDITOR_STYLE_MIDLET_BG);
-      SetAttrs(FloatAttri,[],CODE_EDITOR_STYLE_MIDLET_FG,CODE_EDITOR_STYLE_MIDLET_BG);
-      SetAttrs(HexAttri,[],CODE_EDITOR_STYLE_MIDLET_FG,CODE_EDITOR_STYLE_MIDLET_BG);
-      SetAttrs(CharAttri,[],CODE_EDITOR_STYLE_MIDLET_FG,CODE_EDITOR_STYLE_MIDLET_BG);
-    end;
-    SetGutter(clBlack,gbsRight,clWhite,clSilver,clSilver);
+  end else begin
+    SetPascalCodeEditorStyleFromFile(FSynEdit, s);
     FDiffModifyColor := CODE_EDITOR_STYLE_MIDLET_DIFF_MOD;
     FDiffDeleteColor := CODE_EDITOR_STYLE_MIDLET_DIFF_DEL;
     FDiffAddColor := CODE_EDITOR_STYLE_MIDLET_DIFF_ADD;
   end;
-  FSynEdit.ExtraLineSpacing := 0;
+  FDiffGutterColor := FSynEdit.Gutter.GradientStartColor;
   FSynEdit.Font.Name := gSettings.CodeEditorFontName;
   FSynEdit.Font.Size := gSettings.CodeEditorFontSize;
-  FDiffGutterColor := FSynEdit.Gutter.GradientStartColor;
-  SetPreferences(FPreprocessSynEdit);
-  SetPreferences(FHistoryContentsSynEdit);
-  SetGridPreferences(FDiff1StringGrid);
-  SetGridPreferences(FDiff2StringGrid);
+  CopyStyle(FSynEdit, FPreprocessSynEdit);
+  CopyStyle(FSynEdit, FHistoryContentsSynEdit);
+  SetStringGridPreferences(FDiff1StringGrid);
+  SetStringGridPreferences(FDiff2StringGrid);
 end;
 
 procedure Tmp3CodeEditorFrame.GridDrawCell(Sender: TObject; ACol, ARow: Integer;

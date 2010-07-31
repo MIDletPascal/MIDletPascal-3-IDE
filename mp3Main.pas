@@ -99,8 +99,6 @@ type
     actSaveCompilerMessages: TAction;
     SaveToFile1: TMenuItem;
     al_actCodeEditorStyle: TActionList;
-    actClassicStyle: TAction;
-    actMidletStyle: TAction;
     N2: TMenuItem;
     Copy1: TMenuItem;
     SelectAll1: TMenuItem;
@@ -152,8 +150,6 @@ type
     actGoto: TAction;
     actNextTab: TAction;
     actPreviousTab: TAction;
-    FontSeparator: TAction;
-    actSetFont: TAction;
     al_actKeepHistory: TActionList;
     actBackupsDisabled: TAction;
     actBackupsUnlimited: TAction;
@@ -283,6 +279,7 @@ type
     procedure OnCompilerMessagesPanelClose(Sender: TObject);
     procedure OnDoubleClickLine(Sender: TObject; ALine: string);
     procedure OnMainFramePopup(Sender: TObject);
+    procedure OnSetCodeEditorStyle(Sender: TObject);
     procedure OnCodeEditorPreprocess(Sender: TObject);
     procedure OnCodeEditorHistory(Sender: TObject);
     procedure OnCodeEditorOpenFileAtCursor(Sender: TObject);
@@ -1994,15 +1991,70 @@ begin
   end;
 end;
 
-procedure Tmp3MainForm.RefreshStyleActions;
+procedure Tmp3MainForm.OnSetCodeEditorStyle(Sender: TObject);
 begin
-  actMidletStyle.Checked := gSettings.CodeEditorStyle = CODE_EDITOR_STYLE_MIDLET;
-  actClassicStyle.Checked := gSettings.CodeEditorStyle = CODE_EDITOR_STYLE_CLASSIC;
+  if assigned(Sender) and (Sender is TAction) then begin
+    gSettings.CodeEditorStyle := TAction(Sender).Caption;
+    FMainFrame.RefreshCodeEditorStyle;
+    RefreshSubmenus;
+  end;
+end;
+
+procedure Tmp3MainForm.RefreshStyleActions;
+
+  procedure RetrieveStyles(var AStylesList: TStringList);
+  var SR: TSearchRec; x: integer;
+  begin
+    x := FindFirst(gSettings.AppPath+'Styles\*'+EXTENSION_CES, 0, SR);
+    if x = 0 then repeat
+      AStylesList.Add(ChangeFileExt(SR.Name,''));
+      x := FindNext(SR);
+    until x <> 0;
+    FindClose(SR);
+  end;
+
+var i: integer; st: TStringList; action: TAction; o: boolean;
+begin
+  for i := al_actCodeEditorStyle.ActionCount-1 downto 0 do begin
+    action := TAction(al_actCodeEditorStyle.Actions[i]);
+    action.ActionList := nil;
+    action.Free;
+  end;
+  o := false;
+  st := TStringList.Create;
+  try
+    RetrieveStyles(st);
+    for i := 0 to st.Count - 1 do begin
+      action := TAction.Create(Self);
+      action.Caption := st[i];
+      action.Checked := SameText(gSettings.CodeEditorStyle, action.Caption);
+      o := o or action.Checked;
+      action.OnExecute := OnSetCodeEditorStyle;
+      action.ActionList := al_actCodeEditorStyle;
+    end;
+  finally
+    st.Free;
+  end;
+  action := TAction.Create(Self);
+  action.Caption := CODE_EDITOR_STYLE_CLASSIC;
+  action.Checked := (not o) or SameText(gSettings.CodeEditorStyle, action.Caption);
+  action.OnExecute := OnSetCodeEditorStyle;
+  action.ActionList := al_actCodeEditorStyle;
+  // add separator
+  action := TAction.Create(Self);
+  action.Caption := '-';
+  action.ActionList := al_actCodeEditorStyle;
+  // add set font
+  action := TAction.Create(Self);
+  action.Caption := _('Set &Font');
+  action.OnExecute := actSetFontExecute;
+  action.ActionList := al_actCodeEditorStyle;
 end;
 
 procedure Tmp3MainForm.RefreshSubmenus(AAvoidRetranslation: boolean = false);
 begin
   RefreshReopen;
+  RefreshStyleActions;
   RefreshEmulators;
   if AAvoidRetranslation then
     SetSubmenus(alMainMenu)
