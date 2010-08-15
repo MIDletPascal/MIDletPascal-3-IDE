@@ -52,7 +52,7 @@ begin
         projects := xml.DocumentElement.ChildNodes[h];
         for i := 0 to projects.ChildNodes.Count - 1 do
           if projects.ChildNodes[i].NodeName = TAG_PROJECTS_PROJECT then
-            AGroup.Projects.Add(
+            AGroup.Projects.Include(
               projects.ChildNodes[i].Attributes.GetNamedItem(TAG_PROJECTS_PROJECT_FILENAME).NodeValue
             );
       end;

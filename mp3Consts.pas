@@ -12,11 +12,11 @@ const
   PROJECT_NAME = 'MIDletPascal';
   PROJECT_MAJOR_VERSION = '3';
   PROJECT_MINOR_VERSION = '1';
-  PROJECT_LABEL_VERSION = 'BETA';
+  PROJECT_LABEL_VERSION = 'CANDIDATE';
   PROJECT_VERSION =
     PROJECT_MAJOR_VERSION+'.'+PROJECT_MINOR_VERSION+' '+PROJECT_LABEL_VERSION;
-  RELEASE_DATE_DAY = '31';
-  RELEASE_DATE_MONTH = '07';
+  RELEASE_DATE_DAY = '14';
+  RELEASE_DATE_MONTH = '08';
   RELEASE_DATE_YEAR = '2010';
 
   PROJECT_SITE_URL =
@@ -27,7 +27,8 @@ const
     'http://sourceforge.net/api/file/index/project-id/279759/mtime/desc/rss';
 
   RECENTS_FILENAME = 'recents.ini';
-  
+
+  STYLES_DIR ='Styles';  
   STUBS_DIR = 'Stubs';
   LIBS_DIR = 'Libs';
   HELP_DIR = 'Help';

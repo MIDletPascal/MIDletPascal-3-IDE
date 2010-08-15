@@ -721,9 +721,9 @@ procedure Tmp3CodeEditorFrame.SetColorSpeedSetting(AColorSetting: string);
 
 var s: string;
 begin
-  s := gSettings.AppPath+'Styles\'+AColorSetting+'.ces';
+  s := gSettings.AppPath+STYLES_DIR+'\'+AColorSetting+'.ces';
   if (AColorSetting = CODE_EDITOR_STYLE_CLASSIC) or not FileExists(s) then begin
-    SetPascalCodeEditorStandardStyle(FSynEdit);
+    SetPascalCodeEditorClassicStyle(FSynEdit);
     FDiffModifyColor := CODE_EDITOR_STYLE_CLASSIC_DIFF_MOD;
     FDiffDeleteColor := CODE_EDITOR_STYLE_CLASSIC_DIFF_DEL;
     FDiffAddColor := CODE_EDITOR_STYLE_CLASSIC_DIFF_ADD;

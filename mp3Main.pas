@@ -26,7 +26,8 @@ uses
   sitConsts,
   mp3Consts, mp3FileKind, mp3Settings, mp3About, mp3ProjectBuilding,
   mp3Group, mp3Project, mp3SourceFiles, mp3ResourceFiles,
-  mp3ProjectManager, mp3GroupManager, mp3EmulatorsDialog,
+  mp3ProjectManager, mp3GroupManager,
+  mp3EmulatorsDialog, mp3CodeEditorStylesDialog,
   mp3CodeEditorFrame, mp3MainFrame;
 
 const
@@ -266,6 +267,7 @@ type
     FReferenceTopics: TStringList;
     FAvailableTranslations: TStringList;
     FLastDownloadProgressMessageTickCount: DWORD;
+    procedure OnManageCodeEditorStylesExecute(Sender: TObject);
     procedure OnManageEmulatorsExecute(Sender: TObject);
     procedure OnSetDefaultEmulatorExecute(Sender: TObject);
     procedure OnOpenRecentProjectExecute(Sender: TObject);
@@ -1899,6 +1901,18 @@ begin
   end;
 end;
 
+procedure Tmp3MainForm.OnManageCodeEditorStylesExecute(Sender: TObject);
+begin
+  with Tmp3CodeEditorStylesDialog.Create(Self) do
+  try
+    ShowModal;
+  finally
+    Free;
+  end;
+  FMainFrame.RefreshCodeEditorStyle;
+  RefreshSubmenus;
+end;
+
 procedure Tmp3MainForm.OnManageEmulatorsExecute(Sender: TObject);
 begin
   with Tmp3EmulatorsDialog.Create(Self) do
@@ -1948,7 +1962,7 @@ begin
   action := TAction.Create(Self);
   action.Caption := '-';
   action.ActionList := al_actEmulators;
-  // add clear recent projects
+  // add manage
   action := TAction.Create(Self);
   action.Caption := _('Manage...');
   action.OnExecute := OnManageEmulatorsExecute;
@@ -2001,19 +2015,7 @@ begin
 end;
 
 procedure Tmp3MainForm.RefreshStyleActions;
-
-  procedure RetrieveStyles(var AStylesList: TStringList);
-  var SR: TSearchRec; x: integer;
-  begin
-    x := FindFirst(gSettings.AppPath+'Styles\*'+EXTENSION_CES, 0, SR);
-    if x = 0 then repeat
-      AStylesList.Add(ChangeFileExt(SR.Name,''));
-      x := FindNext(SR);
-    until x <> 0;
-    FindClose(SR);
-  end;
-
-var i: integer; st: TStringList; action: TAction; o: boolean;
+var i: integer; action: TAction; o: boolean;
 begin
   for i := al_actCodeEditorStyle.ActionCount-1 downto 0 do begin
     action := TAction(al_actCodeEditorStyle.Actions[i]);
@@ -2021,24 +2023,28 @@ begin
     action.Free;
   end;
   o := false;
-  st := TStringList.Create;
-  try
-    RetrieveStyles(st);
-    for i := 0 to st.Count - 1 do begin
-      action := TAction.Create(Self);
-      action.Caption := st[i];
-      action.Checked := SameText(gSettings.CodeEditorStyle, action.Caption);
-      o := o or action.Checked;
-      action.OnExecute := OnSetCodeEditorStyle;
-      action.ActionList := al_actCodeEditorStyle;
-    end;
-  finally
-    st.Free;
+  gSettings.CodeEditorStyles.Refresh;
+  for i := 0 to gSettings.CodeEditorStyles.List.Count - 1 do begin
+    action := TAction.Create(Self);
+    action.Caption := gSettings.CodeEditorStyles.List[i];
+    action.Checked := SameText(gSettings.CodeEditorStyle, action.Caption);
+    o := o or action.Checked;
+    action.OnExecute := OnSetCodeEditorStyle;
+    action.ActionList := al_actCodeEditorStyle;
   end;
   action := TAction.Create(Self);
   action.Caption := CODE_EDITOR_STYLE_CLASSIC;
   action.Checked := (not o) or SameText(gSettings.CodeEditorStyle, action.Caption);
   action.OnExecute := OnSetCodeEditorStyle;
+  action.ActionList := al_actCodeEditorStyle;
+  // add separator
+  action := TAction.Create(Self);
+  action.Caption := '-';
+  action.ActionList := al_actCodeEditorStyle;
+  // add manage
+  action := TAction.Create(Self);
+  action.Caption := _('Manage...');
+  action.OnExecute := OnManageCodeEditorStylesExecute;
   action.ActionList := al_actCodeEditorStyle;
   // add separator
   action := TAction.Create(Self);
@@ -2054,8 +2060,8 @@ end;
 procedure Tmp3MainForm.RefreshSubmenus(AAvoidRetranslation: boolean = false);
 begin
   RefreshReopen;
-  RefreshStyleActions;
   RefreshEmulators;
+  RefreshStyleActions;
   if AAvoidRetranslation then
     SetSubmenus(alMainMenu)
   else begin

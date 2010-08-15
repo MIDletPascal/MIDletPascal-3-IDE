@@ -1,9 +1,9 @@
 [Setup]
 AppCopyright=Copyright by MIDletPascal project
-AppName=MIDletPascal 3.1 BETA
-AppVerName=MIDletPascal 3.1 BETA
-DefaultDirName={pf}\MIDletPascal 3.1 BETA
-DefaultGroupName=MIDletPascal 3.1 BETA
+AppName=MIDletPascal 3.1 CANDIDATE
+AppVerName=MIDletPascal 3.1 CANDIDATE
+DefaultDirName={pf}\MIDletPascal 3.1 CANDIDATE
+DefaultGroupName=MIDletPascal 3.1 CANDIDATE
 ShowLanguageDialog=yes
 AppID={{03CC75C8-4327-46F0-A248-C859D063DCE6}
 UninstallDisplayIcon={app}\mp3IDE.exe
@@ -45,12 +45,12 @@ Source: bin\Libs\Lib_rsenum.java; DestDir: {app}\Libs\
 Source: bin\Demos\*; DestDir: {commondocs}\MIDletPascal\Demos\; Flags: recursesubdirs createallsubdirs
 
 [Icons]
-Name: {group}\MIDletPascal 3.1 BETA; Filename: {app}\mp3IDE.exe; WorkingDir: {app}; IconFilename: {app}\mp3IDE.exe; IconIndex: 0
-Name: {group}\MIDletPascal 3.1 BETA Demos; Filename: {commondocs}\MIDletPascal\Demos\
-Name: {group}\MIDletPascal 3.1 BETA Help; Filename: {app}\Help\en\Index.htm
-Name: {group}\MIDletPascal 3.1 BETA Readme; Filename: {app}\README.txt
-Name: {group}\MIDletPascal 3.1 BETA History; Filename: {app}\HISTORY.txt
-Name: {group}\MIDletPascal 3.1 BETA License; Filename: {app}\LICENSE.txt
+Name: {group}\MIDletPascal 3.1 CANDIDATE; Filename: {app}\mp3IDE.exe; WorkingDir: {app}; IconFilename: {app}\mp3IDE.exe; IconIndex: 0
+Name: {group}\MIDletPascal 3.1 CANDIDATE Demos; Filename: {commondocs}\MIDletPascal\Demos\
+Name: {group}\MIDletPascal 3.1 CANDIDATE Help; Filename: {app}\Help\en\Index.htm
+Name: {group}\MIDletPascal 3.1 CANDIDATE Readme; Filename: {app}\README.txt
+Name: {group}\MIDletPascal 3.1 CANDIDATE History; Filename: {app}\HISTORY.txt
+Name: {group}\MIDletPascal 3.1 CANDIDATE License; Filename: {app}\LICENSE.txt
 
 [Registry]
 Root: HKCR; Subkey: ".mpsrc"; ValueType: "string"; ValueData: "MidletPascal.Source"

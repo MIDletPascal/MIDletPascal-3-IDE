@@ -11,7 +11,7 @@ uses
   Windows, ShlObj, ActiveX,
   Forms, Classes, SysUtils, IniFiles,
   mp3Consts,
-  sitMRUIni, sitOSUtils;
+  sitSynCodeEditorStylesPas, sitMRUIni, sitOSUtils;
 
 type
   Tmp3Settings = class
@@ -20,6 +20,7 @@ type
     FAppPath: string;
     FConfigPath: string;
     FIniFile: TIniFile;
+    FCodeEditorStyles: TsitSynCodeEditorStylesPas;
     FEmulators: TStringList;
     FCurrentEmulatorName: string;
     FLibrariesDirectory: string;
@@ -41,6 +42,7 @@ type
     procedure InitConfigPath;
     function GetHelpFile: string;
     function GetCurrentEmulatorCommandLine: string;
+    function GetCodeEditorStyles: TsitSynCodeEditorStylesPas;
   public
     constructor Create;
     destructor Destroy; override;
@@ -56,6 +58,7 @@ type
     property LibrariesDirectory: string read FLibrariesDirectory;
     property StubsDirectory: string read FStubsDirectory;
     property Language: string read FLanguage write FLanguage;
+    property CodeEditorStyles: TsitSynCodeEditorStylesPas read GetCodeEditorStyles;
     property CodeEditorStyle: string read FCodeEditorStyle write FCodeEditorStyle;
     property CodeEditorFontName: string read FCodeEditorFontName write FCodeEditorFontName;
     property CodeEditorFontSize: integer read FCodeEditorFontSize write FCodeEditorFontSize;
@@ -116,6 +119,7 @@ begin
   FAppPath := ExtractFilePath(Application.Exename);
   InitConfigPath;
   FIniFile := TIniFile.Create(ConfigurationFile);
+  FCodeEditorStyles := TsitSynCodeEditorStylesPas.Create(FAppPath+STYLES_DIR+'\', EXTENSION_CES);
   FEmulators := TStringList.Create;
   FLibrariesDirectory := ExtractFilePath(Application.Exename)+LIBS_DIR+'\';
   FStubsDirectory := ExtractFilePath(Application.Exename)+STUBS_DIR+'\';
@@ -126,9 +130,15 @@ end;
 destructor Tmp3Settings.Destroy;
 begin
   FreeAndNil(FIniFile);
+  FreeAndNil(FCodeEditorStyles);
   FreeAndNil(FEmulators);
   FreeAndNil(FRecents);
   inherited;
+end;
+
+function Tmp3Settings.GetCodeEditorStyles: TsitSynCodeEditorStylesPas;
+begin
+  result := FCodeEditorStyles;
 end;
 
 function Tmp3Settings.GetConfigurationFile: string;
