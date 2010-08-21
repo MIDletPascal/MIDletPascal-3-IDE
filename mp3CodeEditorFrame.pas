@@ -10,8 +10,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Forms, Math,
   Controls, StdCtrls, ComCtrls, Graphics, Grids,
-  SpTBXTabs, SpTBXSkins, SpTBXEditors,
-  SpTBXControls, SpTBXDkPanels, SpTBXItem,
+  SpTBXSkins, SpTBXTabs,
   TB2Dock,
   Diff, HashUnit,
   SynEdit,
@@ -22,17 +21,17 @@ uses
   SynEditAutoComplete, SynEditKeyCmds,
   SynEditHighlighter,
   gnugettext,
-  tuiFindDialog, tuiReplaceDialog,  
+  tuiFindDialog, tuiReplaceDialog, tuiControls,  
   sitEditorFrame, sitSynCodeEditorStyle, sitSynCodeEditorStylePas,
   mp3FileKind, mp3Consts, mp3Settings;
 
 type
   Tmp3CodeEditorFrame = class(TsitEditorFrame)
   private
-    FTabControl: TSpTBXTabControl;
-    FCodeTab: TSpTBXTabItem;
-    FPreprocessTab: TSpTBXTabItem;
-    FHistoryTab: TSpTBXTabItem;
+    FTabControl: TtuiTabControl;
+    FCodeTab: TtuiTabItem;
+    FPreprocessTab: TtuiTabItem;
+    FHistoryTab: TtuiTabItem;
     FSynEdit: TSynEdit;
     FPreprocessSynEdit: TSynEdit;
     FHistoryContentsSynEdit: TSynEdit;
@@ -43,15 +42,15 @@ type
     FOnGetHelpOnWord: TNotifyEvent;
     FOnRollback: TNotifyEvent;
     FOnSendToBuffer: TNotifyEvent;
-    FHistoryContentsComboBox: TSpTBXComboBox;
+    FHistoryContentsComboBox: TtuiComboBox;
     FDiff1StringGrid: TStringGrid;
     FDiff2StringGrid: TStringGrid;
     FDiff1Source: TUnicodeStringList;
     FDiff2Source: TUnicodeStringList;
-    FDiff1ComboBox: TSpTBXComboBox;
-    FDiff2ComboBox: TSpTBXComboBox;
-    FDiff1Panel: TSpTBXPanel;
-    FDiff2Panel: TSpTBXPanel;
+    FDiff1ComboBox: TtuiComboBox;
+    FDiff2ComboBox: TtuiComboBox;
+    FDiff1Panel: TtuiPanel;
+    FDiff2Panel: TtuiPanel;
     FDiff1HashList: TList;
     FDiff2HashList: TList;
     FDiff: TDiff;
@@ -59,9 +58,9 @@ type
     FDiffModifyColor: TColor;
     FDiffDeleteColor: TColor;
     FDiffAddColor: TColor;
-    FHistoryTabControl: TSpTBXTabControl;
-    FHistoryContentsTab: TSpTBXTabItem;
-    FHistoryDiffTab: TSpTBXTabItem;
+    FHistoryTabControl: TtuiTabControl;
+    FHistoryContentsTab: TtuiTabItem;
+    FHistoryDiffTab: TtuiTabItem;
     FSearch: TSynEditSearch;
     FSearchRegex: TSynEditRegexSearch;
     FSearchCaseSensitive: boolean;
@@ -69,10 +68,10 @@ type
     FSearchText: string;
     FReplaceText: string;
     FReplaceAll: boolean;
-    FHistoryDockTop: TSpTBXDock;
-    FHistoryToolbar: TSpTBXToolbar;
-    FHistoryRollbackButton: TSpTBXItem;
-    FHistorySendToBufferButton: TSpTBXItem;
+    FHistoryDockTop: TtuiDock;
+    FHistoryToolbar: TtuiToolbar;
+    FHistoryRollbackButton: TtuiMenuItem;
+    FHistorySendToBufferButton: TtuiMenuItem;
     procedure GridDrawCell(Sender: TObject; ACol, ARow: Integer;
       Rect: TRect; State: TGridDrawState);
     procedure GridTopLeftChanged(Sender: TObject);
@@ -216,24 +215,24 @@ procedure Tmp3CodeEditorFrame.AfterConstruction;
     procedure InitContentsTab;
     begin
       FHistoryContentsTab := FHistoryTabControl.Add(_('Contents'));
-      FHistoryDockTop := TSpTBXDock.Create(Self);
+      FHistoryDockTop := TtuiDock.Create(Self);
       FHistoryDockTop.Parent := FHistoryTabControl.Pages[0];
       FHistoryDockTop.Position := dpTop;
       FHistoryDockTop.AllowDrag := false;
       FHistoryDockTop.Align := alTop;
       FHistoryDockTop.Height := 16;
-      FHistoryToolbar := TSpTBXToolbar.Create(Self);
+      FHistoryToolbar := TtuiToolbar.Create(Self);
       FHistoryToolbar.Parent := FHistoryDockTop;
-      FHistoryRollbackButton := TSpTBXItem.Create(Self);
+      FHistoryRollbackButton := TtuiMenuItem.Create(Self);
       FHistoryRollbackButton.Caption := _('Rollback to this version');
       FHistoryRollbackButton.OnClick := OnRollbackClick;
-      FHistorySendToBufferButton := TSpTBXItem.Create(Self);
+      FHistorySendToBufferButton := TtuiMenuItem.Create(Self);
       FHistorySendToBufferButton.Caption := _('Send to buffer');
       FHistorySendToBufferButton.OnClick := OnSendToBufferClick;
       FHistoryToolbar.Items.Add(FHistoryRollbackButton);
-      FHistoryToolbar.Items.Add(TSpTBXSeparatorItem.Create(Self));
+      FHistoryToolbar.Items.Add(TtuiSeparatorMenuItem.Create(Self));
       FHistoryToolbar.Items.Add(FHistorySendToBufferButton);
-      FHistoryContentsComboBox := TSpTBXComboBox.Create(Self);
+      FHistoryContentsComboBox := TtuiComboBox.Create(Self);
       FHistoryContentsComboBox.Parent := FHistoryTabControl.Pages[0];
       FHistoryContentsComboBox.Align := alTop;
       FHistoryContentsComboBox.OnChange := OnHistoryContentsComboBoxChange;
@@ -247,11 +246,11 @@ procedure Tmp3CodeEditorFrame.AfterConstruction;
     procedure InitDiffTab;
     begin
       FHistoryDiffTab := FHistoryTabControl.Add(_('Difference'));
-      FDiff1Panel := TSpTBXPanel.Create(Self);
+      FDiff1Panel := TtuiPanel.Create(Self);
       FDiff1Panel.Parent := FHistoryTabControl.Pages[1];
       FDiff1Panel.Borders := false;
       FDiff1Panel.Align := alLeft;
-      FDiff1ComboBox := TSpTBXComboBox.Create(Self);
+      FDiff1ComboBox := TtuiComboBox.Create(Self);
       FDiff1ComboBox.Parent := FDiff1Panel;
       FDiff1ComboBox.Align := alTop;
       FDiff1ComboBox.OnChange := OnDiff1ComboBoxChange;
@@ -271,16 +270,16 @@ procedure Tmp3CodeEditorFrame.AfterConstruction;
       FDiff1StringGrid.GridLineWidth := 0;
       FDiff1StringGrid.Options := [goFixedVertLine, goFixedHorzLine,
         goVertLine, goHorzLine, goDrawFocusSelected, goRowSelect];
-      with TSpTBXSplitter.Create(Self) do begin
+      with TtuiSplitter.Create(Self) do begin
         Parent := FHistoryTabControl.Pages[1];
         Align := alLeft;
         Visible := true;
       end;
-      FDiff2Panel := TSpTBXPanel.Create(Self);
+      FDiff2Panel := TtuiPanel.Create(Self);
       FDiff2Panel.Parent := FHistoryTabControl.Pages[1];
       FDiff2Panel.Borders := false;
       FDiff2Panel.Align := alClient;
-      FDiff2ComboBox := TSpTBXComboBox.Create(Self);
+      FDiff2ComboBox := TtuiComboBox.Create(Self);
       FDiff2ComboBox.Parent := FDiff2Panel;
       FDiff2ComboBox.Align := alTop;
       FDiff2ComboBox.OnChange := OnDiff2ComboBoxChange;
@@ -310,7 +309,7 @@ procedure Tmp3CodeEditorFrame.AfterConstruction;
   begin
     FHistoryTab := FTabControl.Add(_('History'));
     FHistoryTab.OnClick := OnHistoryClick;
-    FHistoryTabControl := TSpTBXTabControl.Create(Self);
+    FHistoryTabControl := TtuiTabControl.Create(Self);
     FHistoryTabControl.Parent := FTabControl.Pages[2];
     FHistoryTabControl.Align := alClient;
     FHistoryTabControl.TabPosition := ttpBottom;
@@ -321,7 +320,7 @@ procedure Tmp3CodeEditorFrame.AfterConstruction;
 begin
   inherited;
   Kind := ekCode;
-  FTabControl := TSpTBXTabControl.Create(Self);
+  FTabControl := TtuiTabControl.Create(Self);
   FTabControl.Parent := Self;
   FTabControl.Align := alClient;
   FTabControl.TabPosition := ttpBottom;
@@ -572,7 +571,7 @@ end;
 
 procedure Tmp3CodeEditorFrame.SetHistoricalItems(AItems: string);
 
-  procedure SetComboBox(AComboBox: TSpTBXComboBox);
+  procedure SetComboBox(AComboBox: TtuiComboBox);
   begin
     AComboBox.Items.Text := AItems;
     AComboBox.Enabled := AComboBox.Items.Count > 0;
@@ -721,7 +720,7 @@ procedure Tmp3CodeEditorFrame.SetColorSpeedSetting(AColorSetting: string);
 
 var s: string;
 begin
-  s := gSettings.AppPath+STYLES_DIR+'\'+AColorSetting+'.ces';
+  s := gSettings.CodeEditorStyles.Path+AColorSetting+EXTENSION_CES;
   if (AColorSetting = CODE_EDITOR_STYLE_CLASSIC) or not FileExists(s) then begin
     SetPascalCodeEditorClassicStyle(FSynEdit);
     FDiffModifyColor := CODE_EDITOR_STYLE_CLASSIC_DIFF_MOD;

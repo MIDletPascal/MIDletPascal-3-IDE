@@ -1392,7 +1392,13 @@ object mp3MainForm: Tmp3MainForm
     end
   end
   object al_actLanguage: TActionList
+    Images = ilLanguages
     Left = 104
     Top = 72
+  end
+  object ilLanguages: TImageList
+    Height = 11
+    Left = 424
+    Top = 264
   end
 end

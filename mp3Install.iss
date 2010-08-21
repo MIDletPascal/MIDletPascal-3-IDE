@@ -1,9 +1,9 @@
 [Setup]
 AppCopyright=Copyright by MIDletPascal project
-AppName=MIDletPascal 3.1 CANDIDATE
-AppVerName=MIDletPascal 3.1 CANDIDATE
-DefaultDirName={pf}\MIDletPascal 3.1 CANDIDATE
-DefaultGroupName=MIDletPascal 3.1 CANDIDATE
+AppName=MIDletPascal 3.1 CANDIDATE 2
+AppVerName=MIDletPascal 3.1 CANDIDATE 2
+DefaultDirName={pf}\MIDletPascal 3.1 CANDIDATE 2
+DefaultGroupName=MIDletPascal 3.1 CANDIDATE 2
 ShowLanguageDialog=yes
 AppID={{03CC75C8-4327-46F0-A248-C859D063DCE6}
 UninstallDisplayIcon={app}\mp3IDE.exe
@@ -36,21 +36,21 @@ Source: LICENSE.txt; DestDir: {app}; DestName: mp3IDE-LICENSE.txt
 Source: bin\LICENSE.txt; DestDir: {app}
 Source: bin\README.txt; DestDir: {app}; Flags: isreadme
 Source: bin\Stubs\*.class; DestDir: {app}\Stubs\
-Source: bin\Styles\*.ces; DestDir: {app}\Styles\
 Source: default.po; DestDir: {app}\Locale\
 Source: bin\Locale\*; DestDir: {app}\Locale\; Flags: recursesubdirs createallsubdirs
 Source: bin\Help\*; DestDir: {app}\Help\; Flags: recursesubdirs createallsubdirs
 Source: bin\Libs\Lib_rsenum.class; DestDir: {app}\Libs\
 Source: bin\Libs\Lib_rsenum.java; DestDir: {app}\Libs\
 Source: bin\Demos\*; DestDir: {commondocs}\MIDletPascal\Demos\; Flags: recursesubdirs createallsubdirs
+Source: bin\Styles\*.ces; DestDir: {commondocs}\MIDletPascal\Styles\
 
 [Icons]
-Name: {group}\MIDletPascal 3.1 CANDIDATE; Filename: {app}\mp3IDE.exe; WorkingDir: {app}; IconFilename: {app}\mp3IDE.exe; IconIndex: 0
-Name: {group}\MIDletPascal 3.1 CANDIDATE Demos; Filename: {commondocs}\MIDletPascal\Demos\
-Name: {group}\MIDletPascal 3.1 CANDIDATE Help; Filename: {app}\Help\en\Index.htm
-Name: {group}\MIDletPascal 3.1 CANDIDATE Readme; Filename: {app}\README.txt
-Name: {group}\MIDletPascal 3.1 CANDIDATE History; Filename: {app}\HISTORY.txt
-Name: {group}\MIDletPascal 3.1 CANDIDATE License; Filename: {app}\LICENSE.txt
+Name: {group}\MIDletPascal 3.1 CANDIDATE 2; Filename: {app}\mp3IDE.exe; WorkingDir: {app}; IconFilename: {app}\mp3IDE.exe; IconIndex: 0
+Name: {group}\MIDletPascal 3.1 CANDIDATE 2 Demos; Filename: {commondocs}\MIDletPascal\Demos\
+Name: {group}\MIDletPascal 3.1 CANDIDATE 2 Help; Filename: {app}\Help\en\Index.htm
+Name: {group}\MIDletPascal 3.1 CANDIDATE 2 Readme; Filename: {app}\README.txt
+Name: {group}\MIDletPascal 3.1 CANDIDATE 2 History; Filename: {app}\HISTORY.txt
+Name: {group}\MIDletPascal 3.1 CANDIDATE 2 License; Filename: {app}\LICENSE.txt
 
 [Registry]
 Root: HKCR; Subkey: ".mpsrc"; ValueType: "string"; ValueData: "MidletPascal.Source"

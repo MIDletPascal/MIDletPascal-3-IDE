@@ -11,19 +11,14 @@ uses
   Windows, Messages, SysUtils, Dialogs, StrUtils,
   Classes, ImgList, Menus, ShellAPI, ExtCtrls,
   Graphics, Forms, Controls, ActnList,
-  SpTBXItem, SpTBXControls,
   TB2Item, TB2Dock,
   gnugettext, languagecodes,
   DosCommand,
   OtlTask, OtlTaskControl, OtlEventMonitor, OtlComm,
-  tuiItemWithLocationDialog, tuiItemWithSizeDialog,
+  tuiItemWithLocationDialog, tuiItemWithSizeDialog, tuiControls,
   SpTBXMessageDlg, SpTBXInputBox,
-  sitDelforObjectPascalFormatter,
-  sitGenericMainForm,
-  sitCompilerMessagesPanel,
-  sitEditorFrame,
-  sitOSUtils,
-  sitConsts,
+  sitDelforObjectPascalFormatter, sitOSUtils, sitConsts,
+  sitGenericMainForm, sitCompilerMessagesPanel, sitEditorFrame,
   mp3Consts, mp3FileKind, mp3Settings, mp3About, mp3ProjectBuilding,
   mp3Group, mp3Project, mp3SourceFiles, mp3ResourceFiles,
   mp3ProjectManager, mp3GroupManager,
@@ -175,6 +170,7 @@ type
     actCheckForUpdates: TAction;
     FormatSeparator: TAction;
     actFormatSourceCode: TAction;
+    ilLanguages: TImageList;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -340,17 +336,8 @@ uses
 
 {$R *.dfm}
 
-procedure Tmp3MainForm.RefreshAvailableTranslations;
-begin
-  FAvailableTranslations.Clear;
-  gnugettext.DefaultInstance.GetListOfLanguages(
-    gnugettext.DefaultInstance.getcurrenttextdomain,
-    FAvailableTranslations
-  );
-end;
-
 procedure Tmp3MainForm.FormCreate(Sender: TObject);
-var i: integer; ti: TSpTBXItem; si: TSpTBXSeparatorItem;
+var i: integer; ti: TtuiMenuItem; si: TtuiSeparatorMenuItem;
 begin
   inherited;
   KeyPreview := true;
@@ -402,11 +389,11 @@ begin
   FProjectManager.OnBuildConfigurationRename := actRenameBuildConfiguration.OnExecute;
   for i := 0 to pmProjectManager.Items.Count - 1 do
     if pmProjectManager.Items[i].Caption = '-' then begin
-      si := TSpTBXSeparatorItem.Create(FProjectManager.PopupMenu);
+      si := TtuiSeparatorMenuItem.Create(FProjectManager.PopupMenu);
       si.Tag := 0;
       FProjectManager.PopupMenu.Items.Add(si);
     end else begin
-      ti := TSpTBXItem.Create(FProjectManager.PopupMenu);
+      ti := TtuiMenuItem.Create(FProjectManager.PopupMenu);
       ti.Action := pmProjectManager.Items[i].Action;
       ti.Tag := 0;
       FProjectManager.PopupMenu.Items.Add(ti);
@@ -422,11 +409,11 @@ begin
   FGroupManager.OnProjectChange := OnGroupProjectChange;
   for i := 0 to pmGroupManager.Items.Count - 1 do
     if pmGroupManager.Items[i].Caption = '-' then begin
-      si := TSpTBXSeparatorItem.Create(FGroupManager.PopupMenu);
+      si := TtuiSeparatorMenuItem.Create(FGroupManager.PopupMenu);
       si.Tag := 0;
       FGroupManager.PopupMenu.Items.Add(si);
     end else begin
-      ti := TSpTBXItem.Create(FGroupManager.PopupMenu);
+      ti := TtuiMenuItem.Create(FGroupManager.PopupMenu);
       ti.Action := pmGroupManager.Items[i].Action;
       ti.Tag := 0;
       FGroupManager.PopupMenu.Items.Add(ti);
@@ -448,9 +435,9 @@ begin
   mp3ProjectBuilding.CompilerProgressHandler := ShowCompilerProgress;
   for i := 0 to pmCompilerMessagesPanel.Items.Count - 1 do
     if pmCompilerMessagesPanel.Items[i].Caption = '-' then
-      FCompilerMessagesPanel.PopupMenu.Items.Add(TSpTBXSeparatorItem.Create(FCompilerMessagesPanel.PopupMenu))
+      FCompilerMessagesPanel.PopupMenu.Items.Add(TtuiSeparatorMenuItem.Create(FCompilerMessagesPanel.PopupMenu))
     else begin
-      ti := TSpTBXItem.Create(FCompilerMessagesPanel.PopupMenu);
+      ti := TtuiMenuItem.Create(FCompilerMessagesPanel.PopupMenu);
       ti.Action := pmCompilerMessagesPanel.Items[i].Action;
       FCompilerMessagesPanel.PopupMenu.Items.Add(ti);
     end;
@@ -466,7 +453,6 @@ begin
   FBuildNextInGroup := false;
   FRunBuiltMIDlet := false;
   RefreshActions;
-  RefreshStyleActions;
   RefreshCompilerActions;
   RefreshBackupsActions;
   RefreshTranslation;
@@ -483,6 +469,12 @@ begin
   FreeAndNil(FAvailableTranslations);
   if FBuilding then
     actStopBuildProcess.Execute;
+end;
+
+procedure Tmp3MainForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  actCloseAllFilesExecute(nil);
+  CanClose := not FStopCloseAll;
 end;
 
 function Tmp3MainForm.GetReferenceTopic(ATopic: string): integer;
@@ -513,10 +505,33 @@ begin
   FindClose(SR);
 end;
 
-procedure Tmp3MainForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+procedure Tmp3MainForm.RefreshAvailableTranslations;
+
+  procedure AddFlag(ALanguageCode: string);
+  var bmp: TBitmap;
+  begin
+    bmp := TBitmap.Create;
+    bmp.LoadFromFile(gSettings.AppPath+'Locale\'+ALanguageCode+'\flag.bmp');
+    try
+      ilLanguages.AddMasked(bmp, clNone);
+    finally
+      bmp.Free;
+    end;
+  end;
+
+var i: integer;
 begin
-  actCloseAllFilesExecute(nil);
-  CanClose := not FStopCloseAll;
+  // refresh language codes
+  FAvailableTranslations.Clear;
+  gnugettext.DefaultInstance.GetListOfLanguages(
+    gnugettext.DefaultInstance.getcurrenttextdomain,
+    FAvailableTranslations
+  );
+  // refresh language flags
+  ilLanguages.Clear;
+  AddFlag(DEFAULT_LANGUAGE_CODE);
+  for i := 0 to FAvailableTranslations.Count - 1 do
+    AddFlag(FAvailableTranslations[i]);
 end;
 
 procedure Tmp3MainForm.LoadInCodeEditor(AFilename: string);
@@ -1859,6 +1874,7 @@ begin
   action.Tag := -1;
   action.ActionList := al_actLanguage;
   action.Checked := gSettings.Language = DEFAULT_LANGUAGE_CODE;
+  action.ImageIndex := 0;
   for i := 0 to FAvailableTranslations.Count-1 do begin
     action := TAction.Create(Self);
     action.Caption := getlanguagename(FAvailableTranslations[i]);
@@ -1866,6 +1882,7 @@ begin
     action.Tag := i;
     action.ActionList := al_actLanguage;
     action.Checked := gSettings.Language = FAvailableTranslations[i];
+    action.ImageIndex := i + 1;
   end;
 end;
 
@@ -1873,11 +1890,11 @@ procedure Tmp3MainForm.OnMainFramePopup(Sender: TObject);
 
   procedure AddSeparator;
   begin
-    TSpTBXPopupMenu(Sender).Items.Add(TSpTBXSeparatorItem.Create(FMainFrame));
+    TtuiPopupMenu(Sender).Items.Add(TtuiSeparatorMenuItem.Create(FMainFrame));
   end;
 
   procedure AddSubmenu(AActionList: TActionList);
-  var ti: TSpTBXItem; i: integer; action: TAction;
+  var ti: TtuiMenuItem; i: integer; action: TAction;
   begin
     for i := 0 to AActionList.ActionCount - 1 do begin
       action := TAction(AActionList.Actions[i]);
@@ -1885,9 +1902,9 @@ procedure Tmp3MainForm.OnMainFramePopup(Sender: TObject);
         if action.Caption = '-' then
           AddSeparator
         else if action.Enabled then begin
-          ti := TSpTBXItem.Create(FMainFrame);
+          ti := TtuiMenuItem.Create(FMainFrame);
           ti.Action := action;
-          TSpTBXPopupMenu(Sender).Items.Add(ti);
+          TtuiPopupMenu(Sender).Items.Add(ti);
         end;
     end;
   end;
@@ -2093,6 +2110,7 @@ begin
     _('MIDletPascal Source Files')+' '+FILTER_SOURCEFILES+'|'+
     _('MIDletPascal Group Files')+' '+FILTER_GROUPFILES+'|'+
     _('All Files')+' '+FILTER_ALLFILES;
+  dlgSave.Filter := _('All Files')+' '+FILTER_ALLFILES;
   dlgSaveCompilerMessages.Filter := _('All Files')+' '+FILTER_ALLFILES;
   if FProjectManager.HasItemLoaded then  
     SetTitleBarCaption('['+FProjectManager.CurrentProject.MidletInfo.Name+']');

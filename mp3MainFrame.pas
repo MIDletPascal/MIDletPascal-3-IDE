@@ -9,7 +9,6 @@ interface
 
 uses
   Windows, SysUtils, Classes, Forms, Controls, Menus,
-  SpTBXTabs, SpTBXItem, SpTBXControls, SpTBXDkPanels, TB2Dock,
   gnugettext,
   sitFileUtils, sitEditorsFrame, sitEditorFrame, sitFrame,
   sitMPHexEditorFrame, sitPNGImageEditorFrame,

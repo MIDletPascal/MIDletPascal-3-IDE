@@ -9,8 +9,7 @@ interface
 
 uses
   Forms, Controls, Graphics,
-  tuiForm, tuiUtils, tuiItemWithStringValueDialog, tuiDialog,
-  SpTBXControls, SpTBXEditors,
+  tuiForm, tuiUtils, tuiItemWithStringValueDialog, tuiDialog, tuiControls,
   SpTBXMessageDlg, SpTBXInputBox,
   gnugettext,
   mp3Consts, mp3Settings;
@@ -19,12 +18,12 @@ type
   Tmp3CodeEditorStylesDialog = class(TTurboUIDialog)
     procedure FormCreate(Sender: TObject);
   private
-    FCodeEditorStylesLabel: TSpTBXLabel;
-    FCodeEditorStylesListBox: TSpTBXListBox;
-    FAddButton: TSpTBXButton;
-    FEditButton: TSpTBXButton;
-    FDeleteButton: TSpTBXButton;
-    FCloseButton: TSpTBXButton;
+    FCodeEditorStylesLabel: TtuiLabel;
+    FCodeEditorStylesListBox: TtuiListBox;
+    FAddButton: TtuiButton;
+    FEditButton: TtuiButton;
+    FDeleteButton: TtuiButton;
+    FCloseButton: TtuiButton;
     procedure OnAddClick(Sender: TObject);
     procedure OnEditClick(Sender: TObject);
     procedure OnDeleteClick(Sender: TObject);
@@ -39,40 +38,40 @@ implementation
 procedure Tmp3CodeEditorStylesDialog.FormCreate(Sender: TObject);
 begin
   SetTitle(_('Code Editor Styles Management'));
-  FCodeEditorStylesLabel := NewLabel(Self,_('Styles'),
-    40,TUI_DIALOG_HORIZONTAL_MARGIN,16,80);
-  FCodeEditorStylesLabel.Font.Style := [fsBold];
-  FCodeEditorStylesListBox := NewListBox(Self, '',
-    60,TUI_DIALOG_HORIZONTAL_MARGIN,128,
-    TitleBar.Width - (TUI_DIALOG_HORIZONTAL_MARGIN * 2) - TUI_DIALOG_BUTTON_WIDTH - TUI_DIALOG_BUTTON_SEPARATION);
-  FCodeEditorStylesListBox.Cursor := crHandPoint;
-  FCodeEditorStylesListBox.OnDblClick := OnCodeEditorStylesListDoubleClick;
-  FAddButton := NewButton(Self, _('Add'),
-    FCodeEditorStylesListBox.Top,
-    FCodeEditorStylesListBox.Left + FCodeEditorStylesListBox.Width + TUI_DIALOG_BUTTON_SEPARATION,
-    24, TUI_DIALOG_BUTTON_WIDTH + 8);
-  FAddButton.OnClick := OnAddClick;
-  FAddButton.Cursor := crHandPoint;
-  FEditButton := NewButton(Self, _('Edit'),
-    FAddButton.Top + FAddButton.Height + TUI_DIALOG_BUTTON_SEPARATION,
-    FCodeEditorStylesListBox.Left + FCodeEditorStylesListBox.Width + TUI_DIALOG_BUTTON_SEPARATION,
-    24, TUI_DIALOG_BUTTON_WIDTH + 8);
-  FEditButton.OnClick := OnEditClick;
-  FEditButton.Cursor := crHandPoint;
-  FDeleteButton := NewButton(Self, _('Delete'),
-    FEditButton.Top + FEditButton.Height + TUI_DIALOG_BUTTON_SEPARATION,
-    FCodeEditorStylesListBox.Left + FCodeEditorStylesListBox.Width + TUI_DIALOG_BUTTON_SEPARATION,
-    24, TUI_DIALOG_BUTTON_WIDTH + 8);
-  FDeleteButton.OnClick := OnDeleteClick;
-  FDeleteButton.Cursor := crHandPoint;
-  FCloseButton := NewButton(Self, _('Close'),
-    FCodeEditorStylesListBox.Top + FCodeEditorStylesListBox.Height + (TUI_DIALOG_BUTTON_SEPARATION * 2),
-    TUI_DIALOG_HORIZONTAL_MARGIN,
-    //TitleBar.Width - TUI_DIALOG_HORIZONTAL_MARGIN - TUI_DIALOG_BUTTON_WIDTH,
-    24, TUI_DIALOG_BUTTON_WIDTH);
-  FCloseButton.Cursor := crHandPoint;
-  FCloseButton.ModalResult := mrOK;
-  FCloseButton.Default := true;
+  ControlFactory
+      .NewLabel.SetCaption(_('Styles')).SetFontStyle([fsBold])
+      .SetTop(40).SetLeft(TUI_DIALOG_HORIZONTAL_MARGIN)
+      .SetHeight(16).SetWidth(80)
+      .GetInstance(FCodeEditorStylesLabel)
+    .GetFactory
+      .NewListBox
+      .SetTop(60).SetLeft(TUI_DIALOG_HORIZONTAL_MARGIN)
+      .SetHeight(128).SetWidth(TitleBar.Width -
+        (TUI_DIALOG_HORIZONTAL_MARGIN * 2) - TUI_DIALOG_BUTTON_WIDTH - TUI_DIALOG_BUTTON_SEPARATION)
+      .SetCursor(crHandPoint).SetOnDblClick(OnCodeEditorStylesListDoubleClick)
+      .GetInstance(FCodeEditorStylesListBox)
+    .GetFactory
+      .NewButton.SetCaption(_('Close')).SetDefault(true).SetModalResult(mrOk)
+      .SetTop(FCodeEditorStylesListBox.Top + FCodeEditorStylesListBox.Height +
+        (TUI_DIALOG_BUTTON_SEPARATION * 2)).SetLeft(TUI_DIALOG_HORIZONTAL_MARGIN)
+      .SetHeight(24).SetWidth(TUI_DIALOG_BUTTON_WIDTH).SetCursor(crHandPoint)
+      .GetInstance(FCloseButton)
+    .GetFactory
+      .NewButton.SetCaption(_('Add')).SetOnclick(OnAddClick)
+      .SetTop(FCodeEditorStylesListBox.Top).SetLeft(FCodeEditorStylesListBox.Left +
+         FCodeEditorStylesListBox.Width + TUI_DIALOG_BUTTON_SEPARATION)
+      .SetHeight(24).SetWidth(TUI_DIALOG_BUTTON_WIDTH + 8).SetCursor(crHandPoint)
+      .GetInstance(FAddButton)
+    .GetFactory
+      .NewButton.SetCaption(_('Edit')).SetOnclick(OnEditClick)
+      .SetTop(FAddButton.Top + FAddButton.Height + TUI_DIALOG_BUTTON_SEPARATION).SetLeft(FAddButton.Left)
+      .SetHeight(24).SetWidth(TUI_DIALOG_BUTTON_WIDTH + 8).SetCursor(crHandPoint)
+      .GetInstance(FEditButton)
+    .GetFactory
+      .NewButton.SetCaption(_('Delete')).SetOnclick(OnDeleteClick)
+      .SetTop(FEditButton.Top + FEditButton.Height + TUI_DIALOG_BUTTON_SEPARATION).SetLeft(FEditButton.Left)
+      .SetHeight(24).SetWidth(TUI_DIALOG_BUTTON_WIDTH + 8).SetCursor(crHandPoint)
+      .GetInstance(FDeleteButton);
   Height := FCloseButton.Top + FCloseButton.Height + TUI_DIALOG_VERTICAL_MARGIN;
   RefreshCodeEditorStyles;
 end;

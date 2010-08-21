@@ -11,9 +11,9 @@ uses
   Windows, Messages, SysUtils, Dialogs,
   Classes, Graphics, Controls, Forms,
   ImgList, ActnList,
-  SpTBXControls, SpTBXItem, SpTBXEditors,
   VirtualTrees,
   gnugettext,
+  tuiControls,
   sitDockableManagers,
   mp3Group, mp3Consts, mp3FileKind;
 
@@ -357,13 +357,13 @@ procedure Tmp3GroupManager.PopupMenuHandler(Sender: TObjecT);
     end;
   end;
 
-  function NewPopupItem(AAction: TAction): TSpTBXItem;
+  function NewPopupItem(AAction: TAction): TtuiMenuItem;
   begin
-    result := TSpTBXItem.Create(PopupMenu);
+    result := TtuiMenuItem.Create(PopupMenu);
     result.Action := AAction;
   end;
 
-var ANode: PVirtualNode; si: TSpTBXSeparatorItem; x,n,nl: integer; de: boolean;
+var ANode: PVirtualNode; si: TtuiSeparatorMenuItem; x,n,nl: integer; de: boolean;
 begin
   ANode := Tree.GetFirstSelected;
   if not assigned(ANode) then
@@ -371,7 +371,7 @@ begin
   RevertToBasePopupItems;
   nl := Tree.GetNodeLevel(ANode);
   if nl > 0 then begin
-    si := TSpTBXSeparatorItem.Create(PopupMenu);
+    si := TtuiSeparatorMenuItem.Create(PopupMenu);
     si.Tag := nl;
     PopupMenu.Items.Insert(0,si);
     if nl = 1 then begin

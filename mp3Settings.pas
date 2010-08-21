@@ -119,7 +119,7 @@ begin
   FAppPath := ExtractFilePath(Application.Exename);
   InitConfigPath;
   FIniFile := TIniFile.Create(ConfigurationFile);
-  FCodeEditorStyles := TsitSynCodeEditorStylesPas.Create(FAppPath+STYLES_DIR+'\', EXTENSION_CES);
+  FCodeEditorStyles := TsitSynCodeEditorStylesPas.Create(FConfigPath+STYLES_DIR+'\', EXTENSION_CES);
   FEmulators := TStringList.Create;
   FLibrariesDirectory := ExtractFilePath(Application.Exename)+LIBS_DIR+'\';
   FStubsDirectory := ExtractFilePath(Application.Exename)+STUBS_DIR+'\';

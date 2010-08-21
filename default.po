@@ -6,8 +6,8 @@
 #, fuzzy
 msgid ""
 msgstr "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2010-07-10 14:58\n"
-"PO-Revision-Date: 2010-07-10 14:58\n"
+"POT-Creation-Date: 2010-08-14 21:52\n"
+"PO-Revision-Date: 2010-08-14 21:52\n"
 "Last-Translator: Somebody <your.email@address.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -42,32 +42,67 @@ msgstr ""
 msgid "History"
 msgstr ""
 
+#. mp3CodeEditorStylesDialog..Caption
+#: mp3CodeEditorStylesDialog.dfm:4
+msgid "Code Editor Styles"
+msgstr ""
+
+#: mp3CodeEditorStylesDialog.pas:41
+msgid "Code Editor Styles Management"
+msgstr ""
+
+#: mp3CodeEditorStylesDialog.pas:42
+msgid "Styles"
+msgstr ""
+
+#: mp3CodeEditorStylesDialog.pas:50
+#: mp3EmulatorsDialog.pas:50
+msgid "Add"
+msgstr ""
+
+#: mp3CodeEditorStylesDialog.pas:56
+#: mp3EmulatorsDialog.pas:56
+msgid "Edit"
+msgstr ""
+
+#: mp3CodeEditorStylesDialog.pas:62
+#: mp3EmulatorsDialog.pas:62
+msgid "Delete"
+msgstr ""
+
+#: mp3CodeEditorStylesDialog.pas:68
+#: mp3EmulatorsDialog.pas:68
+msgid "Close"
+msgstr ""
+
+#: mp3CodeEditorStylesDialog.pas:92
+msgid "Add Style"
+msgstr ""
+
+#: mp3CodeEditorStylesDialog.pas:92
+#: mp3Main.pas:1566
+#: mp3Main.pas:1756
+msgid "Enter the name:"
+msgstr ""
+
+#: mp3CodeEditorStylesDialog.pas:120
+#: mp3EmulatorsDialog.pas:141
+#: mp3Main.pas:1265
+#: mp3Main.pas:1279
+#: mp3Main.pas:1578
+msgid "Are you sure you want to delete it?"
+msgstr ""
+
 #. mp3EmulatorsDialog..Caption
 #: mp3EmulatorsDialog.dfm:4
 #: mp3EmulatorsDialog.pas:42
 #. mp3MainForm..al_actSettings..actEmulators..Caption
-#: mp3Main.dfm:1348
+#: mp3Main.dfm:1332
 msgid "Emulators"
 msgstr ""
 
 #: mp3EmulatorsDialog.pas:41
 msgid "Emulators Management"
-msgstr ""
-
-#: mp3EmulatorsDialog.pas:50
-msgid "Add"
-msgstr ""
-
-#: mp3EmulatorsDialog.pas:56
-msgid "Edit"
-msgstr ""
-
-#: mp3EmulatorsDialog.pas:62
-msgid "Delete"
-msgstr ""
-
-#: mp3EmulatorsDialog.pas:68
-msgid "Close"
 msgstr ""
 
 #: mp3EmulatorsDialog.pas:93
@@ -77,8 +112,8 @@ msgstr ""
 
 #: mp3EmulatorsDialog.pas:94
 #: mp3EmulatorsDialog.pas:116
-#: mp3Main.pas:1649
-#: mp3Main.pas:1703
+#: mp3Main.pas:1648
+#: mp3Main.pas:1702
 #. TODO: icon iteration
 #: mp3ProjectManager.pas:543
 #: mp3ProjectManager.pas:571
@@ -88,13 +123,6 @@ msgstr ""
 #: mp3EmulatorsDialog.pas:95
 #: mp3EmulatorsDialog.pas:117
 msgid "Command Line"
-msgstr ""
-
-#: mp3EmulatorsDialog.pas:141
-#: mp3Main.pas:1266
-#: mp3Main.pas:1280
-#: mp3Main.pas:1579
-msgid "Are you sure you want to delete it?"
 msgstr ""
 
 #: mp3GroupManager.pas:77
@@ -290,11 +318,11 @@ msgstr ""
 #. mp3MainForm..al_actEdit..actDelete..Caption
 #: mp3Main.dfm:230
 #. mp3MainForm..alPMSourceFiles..actDeleteSourceFile..Caption
-#: mp3Main.dfm:1202
+#: mp3Main.dfm:1186
 #. mp3MainForm..alPMResourceFiles..actDeleteResourceFile..Caption
-#: mp3Main.dfm:1236
+#: mp3Main.dfm:1220
 #. mp3MainForm..alPMBuildConfigurations..actDeleteBuildConfiguration..Caption
-#: mp3Main.dfm:1264
+#: mp3Main.dfm:1248
 msgid "&Delete"
 msgstr ""
 
@@ -360,390 +388,389 @@ msgstr ""
 msgid "C&opy"
 msgstr ""
 
-#. mp3MainForm..al_actCodeEditorStyle..actSetFont..Caption
-#: mp3Main.dfm:1183
-msgid "Set &Font"
-msgstr ""
-
 #. mp3MainForm..alPMSourceFiles..actAddSourceFile..Caption
-#: mp3Main.dfm:1192
+#: mp3Main.dfm:1176
 #. mp3MainForm..alPMResourceFiles..actAddResourceFile..Caption
-#: mp3Main.dfm:1226
+#: mp3Main.dfm:1210
 #. mp3MainForm..alPMBuildConfigurations..actAddBuildConfiguration..Caption
-#: mp3Main.dfm:1259
+#: mp3Main.dfm:1243
 msgid "&Add..."
 msgstr ""
 
 #. mp3MainForm..alPMSourceFiles..actNewSourceFile..Caption
-#: mp3Main.dfm:1197
+#: mp3Main.dfm:1181
 #. mp3MainForm..alPMResourceFiles..actNewResourceFile..Caption
-#: mp3Main.dfm:1231
+#: mp3Main.dfm:1215
 msgid "&New..."
 msgstr ""
 
 #. mp3MainForm..alPMSourceFiles..actRenameSourceFile..Caption
-#: mp3Main.dfm:1207
+#: mp3Main.dfm:1191
 #. mp3MainForm..alPMResourceFiles..actRenameResourceFile..Caption
-#: mp3Main.dfm:1241
+#: mp3Main.dfm:1225
 #. mp3MainForm..alPMBuildConfigurations..actRenameBuildConfiguration..Caption
-#: mp3Main.dfm:1269
+#: mp3Main.dfm:1253
 msgid "&Rename"
 msgstr ""
 
 #. mp3MainForm..alPMSourceFiles..actOpenSourceFile..Caption
-#: mp3Main.dfm:1212
+#: mp3Main.dfm:1196
 #. mp3MainForm..alPMResourceFiles..actOpenResourceFile..Caption
-#: mp3Main.dfm:1246
+#: mp3Main.dfm:1230
 #. mp3MainForm..alGMProjects..actOpenProject..Caption
-#: mp3Main.dfm:1326
+#: mp3Main.dfm:1310
 msgid "&Open"
 msgstr ""
 
 #. mp3MainForm..alPMSourceFiles..actRecreateSourceFile..Caption
-#: mp3Main.dfm:1217
+#: mp3Main.dfm:1201
 msgid "&Recreate"
 msgstr ""
 
 #. mp3MainForm..al_actSearch..actFindText..Caption
-#: mp3Main.dfm:1278
+#: mp3Main.dfm:1262
 msgid "&Find..."
 msgstr ""
 
 #. mp3MainForm..al_actSearch..actFindNext..Caption
-#: mp3Main.dfm:1283
+#: mp3Main.dfm:1267
 msgid "Find &Next"
 msgstr ""
 
 #. mp3MainForm..al_actSearch..actFindPrevious..Caption
-#: mp3Main.dfm:1288
+#: mp3Main.dfm:1272
 msgid "Find &Previous"
 msgstr ""
 
 #. mp3MainForm..al_actSearch..actReplaceText..Caption
-#: mp3Main.dfm:1293
+#: mp3Main.dfm:1277
 msgid "&Replace..."
 msgstr ""
 
 #. mp3MainForm..al_actSearch..actGoto..Caption
-#: mp3Main.dfm:1301
+#: mp3Main.dfm:1285
 msgid "Go to..."
 msgstr ""
 
 #. mp3MainForm..alGMProjects..actBuildAllProjectsFromHere..Caption
-#: mp3Main.dfm:1311
+#: mp3Main.dfm:1295
 msgid "Build &All From Here"
 msgstr ""
 
 #. mp3MainForm..alGMProjects..actIncludeProject..Caption
-#: mp3Main.dfm:1316
+#: mp3Main.dfm:1300
 msgid "&Include..."
 msgstr ""
 
 #. mp3MainForm..alGMProjects..actExcludeProject..Caption
-#: mp3Main.dfm:1321
+#: mp3Main.dfm:1305
 msgid "&Exclude"
 msgstr ""
 
 #. mp3MainForm..al_actSettings..actKeepHistory..Caption
-#: mp3Main.dfm:1342
+#: mp3Main.dfm:1326
 msgid "Keep &History"
 msgstr ""
 
 #. mp3MainForm..al_actSettings..actCodeEditorStyle..Caption
-#: mp3Main.dfm:1345
+#: mp3Main.dfm:1329
 msgid "Code Editor Style"
 msgstr ""
 
 #. mp3MainForm..al_actKeepHistory..actBackupsDisabled..Caption
-#: mp3Main.dfm:1359
+#: mp3Main.dfm:1343
 msgid "&Disabled"
 msgstr ""
 
 #. mp3MainForm..al_actKeepHistory..actBackupsUnlimited..Caption
-#: mp3Main.dfm:1379
+#: mp3Main.dfm:1363
 msgid "&Unlimited"
 msgstr ""
 
 #. mp3MainForm..al_actOpenFolder..actOpenBINFolder..Caption
-#: mp3Main.dfm:1387
+#: mp3Main.dfm:1371
 msgid "Open &BIN Folder"
 msgstr ""
 
 #. mp3MainForm..al_actOpenFolder..actOpenSourceFolder..Caption
-#: mp3Main.dfm:1391
+#: mp3Main.dfm:1375
 msgid "Open &Source Folder"
 msgstr ""
 
 #. mp3MainForm..al_actOpenFolder..actOpenResourceFolder..Caption
-#: mp3Main.dfm:1395
+#: mp3Main.dfm:1379
 msgid "Open &Resource Folder"
 msgstr ""
 
 #. mp3MainForm..al_actOpenFolder..actOpenScriptsFolder..Caption
-#: mp3Main.dfm:1399
+#: mp3Main.dfm:1383
 msgid "Open S&cripts Folder"
 msgstr ""
 
 #. mp3MainForm..al_actOpenFolder..actOpenProjectFolder..Caption
-#: mp3Main.dfm:1406
+#: mp3Main.dfm:1390
 msgid "Open &Project Folder"
 msgstr ""
 
 #. j-a-s-d: Niksa has this in his TODO list
-#: mp3Main.pas:566
+#: mp3Main.pas:565
 msgid "Could not load project"
 msgstr ""
 
-#: mp3Main.pas:596
+#: mp3Main.pas:595
 msgid "Could not load group"
 msgstr ""
 
-#: mp3Main.pas:601
+#: mp3Main.pas:600
 msgid "Are you sure you want to clean it?"
 msgstr ""
 
-#: mp3Main.pas:692
+#: mp3Main.pas:691
 msgid "Are you sure you want to rollback?"
 msgstr ""
 
-#: mp3Main.pas:713
+#: mp3Main.pas:712
 msgid "Are you sure you want to overwrite your "
 "buffer?"
 msgstr ""
 
-#: mp3Main.pas:880
+#: mp3Main.pas:879
 msgid "stopping..."
 msgstr ""
 
-#: mp3Main.pas:908
+#: mp3Main.pas:907
 msgid "Are you sure you want to format it?"
 msgstr ""
 
-#: mp3Main.pas:946
+#: mp3Main.pas:945
 msgid "Go to Line Number..."
 msgstr ""
 
-#: mp3Main.pas:947
+#: mp3Main.pas:946
 msgid "Enter new Line Number:"
 msgstr ""
 
-#: mp3Main.pas:949
+#: mp3Main.pas:948
 msgid "Go to Offset..."
 msgstr ""
 
-#: mp3Main.pas:950
+#: mp3Main.pas:949
 msgid "Enter new Offset:"
 msgstr ""
 
-#: mp3Main.pas:973
+#: mp3Main.pas:972
 msgid "Downloaded:"
 msgstr ""
 
-#: mp3Main.pas:989
+#: mp3Main.pas:988
 msgid "Error downloading."
 msgstr ""
 
-#: mp3Main.pas:991
+#: mp3Main.pas:990
 msgid "There is no updates available."
 msgstr ""
 
-#: mp3Main.pas:1071
+#: mp3Main.pas:1070
 msgid "Are you sure you want to exclude it?"
 msgstr ""
 
-#: mp3Main.pas:1082
-#: mp3Main.pas:2034
+#: mp3Main.pas:1081
+#: mp3Main.pas:2092
 msgid "MIDletPascal Project Files"
 msgstr ""
 
-#: mp3Main.pas:1137
+#: mp3Main.pas:1136
 msgid "Are you sure you want to overwrite it?"
 msgstr ""
 
-#: mp3Main.pas:1174
+#: mp3Main.pas:1173
 msgid "Do you want to save the changes?"
 msgstr ""
 
-#: mp3Main.pas:1267
-#: mp3Main.pas:1281
+#: mp3Main.pas:1266
+#: mp3Main.pas:1280
 msgid "Delete it from disk"
 msgstr ""
 
-#: mp3Main.pas:1337
+#: mp3Main.pas:1336
 msgid "Rename Build Configuration"
 msgstr ""
 
-#: mp3Main.pas:1337
-#: mp3Main.pas:1351
-#: mp3Main.pas:1373
+#: mp3Main.pas:1336
+#: mp3Main.pas:1350
+#: mp3Main.pas:1372
 msgid "Enter the new name:"
 msgstr ""
 
-#: mp3Main.pas:1351
-#: mp3Main.pas:1373
+#: mp3Main.pas:1350
+#: mp3Main.pas:1372
 msgid "Rename Source File"
 msgstr ""
 
-#: mp3Main.pas:1404
+#: mp3Main.pas:1403
 msgid "ERROR: you are not editing any file"
 msgstr ""
 
-#: mp3Main.pas:1411
+#: mp3Main.pas:1410
 msgid "ERROR: the file must belong to a project"
 msgstr ""
 
-#: mp3Main.pas:1421
+#: mp3Main.pas:1420
 msgid "Finished at"
 msgstr ""
 
-#: mp3Main.pas:1470
+#: mp3Main.pas:1469
 msgid "Do you want to install the update?"
 msgstr ""
 
-#: mp3Main.pas:1471
+#: mp3Main.pas:1470
 msgid "Click NO to discard."
 msgstr ""
 
-#: mp3Main.pas:1471
+#: mp3Main.pas:1470
 msgid "Click CANCEL to decide later."
 msgstr ""
 
-#: mp3Main.pas:1514
+#: mp3Main.pas:1513
 msgid "Click here to apply the downloaded update."
 msgstr ""
 
-#: mp3Main.pas:1534
+#: mp3Main.pas:1533
 msgid "building..."
 msgstr ""
 
-#: mp3Main.pas:1535
+#: mp3Main.pas:1534
 msgid "Building"
 msgstr ""
 
-#: mp3Main.pas:1536
+#: mp3Main.pas:1535
 msgid "Started at"
 msgstr ""
 
-#: mp3Main.pas:1538
-#: mp3Main.pas:1540
+#: mp3Main.pas:1537
+#: mp3Main.pas:1539
 msgid "Compiler Communication Method"
 msgstr ""
 
-#: mp3Main.pas:1555
+#: mp3Main.pas:1554
 msgid "Launching"
 msgstr ""
 
-#: mp3Main.pas:1567
+#: mp3Main.pas:1566
 msgid "Add Build Configuration"
 msgstr ""
 
-#: mp3Main.pas:1567
-#: mp3Main.pas:1757
-msgid "Enter the name:"
-msgstr ""
-
-#: mp3Main.pas:1590
-#: mp3Main.pas:2037
-#: mp3Main.pas:2038
+#: mp3Main.pas:1589
+#: mp3Main.pas:2095
+#: mp3Main.pas:2096
 msgid "All Files"
 msgstr ""
 
-#: mp3Main.pas:1597
+#: mp3Main.pas:1596
 msgid "Could not add resource"
 msgstr ""
 
-#: mp3Main.pas:1607
-#: mp3Main.pas:2035
+#: mp3Main.pas:1606
+#: mp3Main.pas:2093
 msgid "MIDletPascal Source Files"
 msgstr ""
 
-#: mp3Main.pas:1630
+#: mp3Main.pas:1629
 msgid "New Group"
 msgstr ""
 
-#: mp3Main.pas:1631
+#: mp3Main.pas:1630
 msgid "Group Name"
 msgstr ""
 
-#: mp3Main.pas:1632
+#: mp3Main.pas:1631
 msgid "Group Location"
 msgstr ""
 
-#: mp3Main.pas:1648
-#: mp3Main.pas:1702
+#: mp3Main.pas:1647
+#: mp3Main.pas:1701
 msgid "New Image"
+msgstr ""
+
+#: mp3Main.pas:1649
+#: mp3Main.pas:1703
+msgid "Width"
 msgstr ""
 
 #: mp3Main.pas:1650
 #: mp3Main.pas:1704
-msgid "Width"
-msgstr ""
-
-#: mp3Main.pas:1651
-#: mp3Main.pas:1705
 msgid "Height"
 msgstr ""
 
-#: mp3Main.pas:1668
+#: mp3Main.pas:1667
 msgid "New Project"
 msgstr ""
 
-#: mp3Main.pas:1669
+#: mp3Main.pas:1668
 msgid "Project Name"
 msgstr ""
 
-#: mp3Main.pas:1670
+#: mp3Main.pas:1669
 msgid "Project Location"
 msgstr ""
 
-#: mp3Main.pas:1673
-#: mp3Main.pas:1763
+#: mp3Main.pas:1672
+#: mp3Main.pas:1762
 msgid "Name is invalid: the minimum length "
 "is"
 msgstr ""
 
-#: mp3Main.pas:1757
+#: mp3Main.pas:1756
 msgid "New Source File"
 msgstr ""
 
-#: mp3Main.pas:1766
+#: mp3Main.pas:1765
 msgid "Name is invalid: there is a Library with the same "
 "name."
 msgstr ""
 
-#. add clear recent projects
-#: mp3Main.pas:1956
+#. add manage
+#: mp3Main.pas:1967
+#. add manage
+#: mp3Main.pas:2046
 msgid "Manage..."
 msgstr ""
 
 #. add clear recent projects
-#: mp3Main.pas:1988
+#: mp3Main.pas:1999
 msgid "Clear"
 msgstr ""
 
-#: mp3Main.pas:2033
+#. add set font
+#: mp3Main.pas:2055
+msgid "Set &Font"
+msgstr ""
+
+#: mp3Main.pas:2091
 msgid "All MIDletPascal Files"
 msgstr ""
 
-#: mp3Main.pas:2036
+#: mp3Main.pas:2094
 msgid "MIDletPascal Group Files"
 msgstr ""
 
-#: mp3Main.pas:2041
+#: mp3Main.pas:2099
 msgid "Yes"
 msgstr ""
 
-#: mp3Main.pas:2042
+#: mp3Main.pas:2100
 msgid "No"
 msgstr ""
 
-#: mp3Main.pas:2043
-#: mp3Main.pas:2049
+#: mp3Main.pas:2101
+#: mp3Main.pas:2107
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:151
 msgid "OK"
 msgstr ""
 
-#: mp3Main.pas:2044
-#: mp3Main.pas:2050
+#: mp3Main.pas:2102
+#: mp3Main.pas:2108
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:155
 #: /code/third/TurboUI/tuiFindDialog.pas:74
 #: /code/third/TurboUI/tuiItemWithLocationDialog.pas:118
 #: /code/third/TurboUI/tuiItemWithSizeDialog.pas:75
@@ -753,19 +780,19 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: mp3Main.pas:2045
+#: mp3Main.pas:2103
 msgid "Warning"
 msgstr ""
 
-#: mp3Main.pas:2046
+#: mp3Main.pas:2104
 msgid "Error"
 msgstr ""
 
-#: mp3Main.pas:2047
+#: mp3Main.pas:2105
 msgid "Information"
 msgstr ""
 
-#: mp3Main.pas:2048
+#: mp3Main.pas:2106
 msgid "Confirm"
 msgstr ""
 
@@ -841,6 +868,135 @@ msgstr ""
 
 #: /code/third/StylishIDEToolkit/sitSFWebUpdateVstDialog.pas:36
 msgid "Please choose an upgrade"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:143
+msgid "Edit Code Editor Style"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:163
+msgid "Item"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:180
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:196
+msgid "Background"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:184
+msgid "Active Line Background"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:188
+msgid "Extra Line Spacing"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:200
+msgid "Foreground"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:204
+msgid "Bold"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:206
+msgid "Italic"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:208
+msgid "Underline"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:210
+msgid "StrikeOut"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:219
+msgid "Text"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:223
+msgid "Gradient Start"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:227
+msgid "Gradient End"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:231
+msgid "Border"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:235
+msgid "Border Style"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:238
+msgid "None"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:238
+msgid "Middle"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:238
+msgid "Right"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:249
+msgid "Editor"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:250
+msgid "Selection"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:251
+msgid "Identifier"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:252
+msgid "Asm"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:253
+msgid "String"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:254
+msgid "Symbol"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:255
+msgid "Keyword"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:256
+msgid "Comment"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:257
+msgid "Directive"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:258
+msgid "Number"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:259
+msgid "Float"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:260
+msgid "Hex"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:261
+msgid "Char"
+msgstr ""
+
+#: /code/third/StylishIDEToolkit/sitSynCodeEditorStylesPas.pas:262
+msgid "Gutter"
 msgstr ""
 
 #. TurboUIFindDialog..Caption

@@ -11,9 +11,9 @@ uses
   Windows, Messages, SysUtils, Dialogs,
   Classes, Graphics, Controls, Forms,
   ImgList, ActnList,
-  SpTBXControls, SpTBXItem, SpTBXEditors,
   VirtualTrees,
   gnugettext,
+  tuiControls,
   sitFileUtils, sitDockableManagers,
   mp3Project, mp3BuildConfigurations, mp3Consts, mp3FileKind;
 
@@ -22,20 +22,20 @@ type
 
   Tmp3ProjectManager = class(TsitTreeDockableManager)
   private
-    FPropertiesPanel: TSpTBXPanel;
-    FPropertiesPanelLabel1: TSpTBXLabel;
-    FPropertiesPanelLabel2: TSpTBXLabel;
-    FPropertiesPanelLabel3: TSpTBXLabel;
-    FPropertiesPanelLabel4: TSpTBXLabel;
-    FPropertiesPanelEdit1: TSpTBXEdit;
-    FPropertiesPanelEdit2: TSpTBXEdit;
-    FPropertiesPanelEdit3: TSpTBXEdit;
-    FPropertiesPanelEdit4: TSpTBXEdit;
-    FPropertiesPanelSpin1: TSpTBXSpinButton;
-    FPropertiesPanelSpin2: TSpTBXSpinButton;
-    FPropertiesPanelSpin3: TSpTBXSpinButton;
-    FPropertiesPanelSpin4: TSpTBXSpinButton;
-    FPropertiesPanelCheckListBox: TSpTBXCheckListBox;
+    FPropertiesPanel: TtuiPanel;
+    FPropertiesPanelLabel1: TtuiLabel;
+    FPropertiesPanelLabel2: TtuiLabel;
+    FPropertiesPanelLabel3: TtuiLabel;
+    FPropertiesPanelLabel4: TtuiLabel;
+    FPropertiesPanelEdit1: TtuiEdit;
+    FPropertiesPanelEdit2: TtuiEdit;
+    FPropertiesPanelEdit3: TtuiEdit;
+    FPropertiesPanelEdit4: TtuiEdit;
+    FPropertiesPanelSpin1: TtuiSpinButton;
+    FPropertiesPanelSpin2: TtuiSpinButton;
+    FPropertiesPanelSpin3: TtuiSpinButton;
+    FPropertiesPanelSpin4: TtuiSpinButton;
+    FPropertiesPanelCheckListBox: TtuiCheckListBox;
     FPropertiesPanelMode: Tmp3PropertiesPanelMode;
     FSourceFilesActions: TActionList;
     FResourceFilesActions: TActionList;
@@ -111,17 +111,17 @@ procedure Tmp3ProjectManager.AfterConstruction;
 
   procedure InitPropertiesPanel;
 
-    function NewLabel(ATop,ALeft:integer):TSpTBXLabel;
+    function NewLabel(ATop,ALeft:integer):TtuiLabel;
     begin
-      result := TSpTBXLabel.Create(FPropertiesPanel);
+      result := TtuiLabel.Create(FPropertiesPanel);
       result.Parent := FPropertiesPanel;
       result.Top := ATop;
       result.Left := ALeft;
     end;
 
-    function NewEdit(ATop,ALeft:integer):TSpTBXEdit;
+    function NewEdit(ATop,ALeft:integer):TtuiEdit;
     begin
-      result := TSpTBXEdit.Create(FPropertiesPanel);
+      result := TtuiEdit.Create(FPropertiesPanel);
       result.Parent := FPropertiesPanel;
       result.Top := ATop;
       result.Left := ALeft;
@@ -130,9 +130,9 @@ procedure Tmp3ProjectManager.AfterConstruction;
       result.Anchors := [akTop,akLeft,akRight];
     end;
 
-    function NewSpinButton(AEdit: TSpTBXEdit): TSpTBXSpinButton;
+    function NewSpinButton(AEdit: TtuiEdit): TtuiSpinButton;
     begin
-      result := TSpTBXSpinButton.Create(FPropertiesPanel);
+      result := TtuiSpinButton.Create(FPropertiesPanel);
       result.Parent := FPropertiesPanel;
       result.Top := AEdit.Top;
       result.Left := Width - AEdit.Left - 32;
@@ -142,7 +142,7 @@ procedure Tmp3ProjectManager.AfterConstruction;
     end;
 
   begin
-    FPropertiesPanel := TSpTBXPanel.Create(BackgroundPanel);
+    FPropertiesPanel := TtuiPanel.Create(BackgroundPanel);
     FPropertiesPanel.Parent := BackgroundPanel;
     FPropertiesPanel.Align := alBottom;
     FPropertiesPanel.Borders := false;
@@ -160,7 +160,7 @@ procedure Tmp3ProjectManager.AfterConstruction;
     FPropertiesPanelSpin2 := NewSpinButton(FPropertiesPanelEdit2);
     FPropertiesPanelSpin3 := NewSpinButton(FPropertiesPanelEdit3);
     FPropertiesPanelSpin4 := NewSpinButton(FPropertiesPanelEdit4);
-    FPropertiesPanelCheckListBox := TSpTBXCheckListBox.Create(FPropertiesPanel);
+    FPropertiesPanelCheckListBox := TtuiCheckListBox.Create(FPropertiesPanel);
     FPropertiesPanelCheckListBox.Parent := FPropertiesPanel;
     FPropertiesPanelCheckListBox.Top := FPropertiesPanelLabel3.Top+16;
     FPropertiesPanelCheckListBox.Left := 6;
@@ -684,7 +684,7 @@ end;
 procedure Tmp3ProjectManager.SpinClick(Sender: TObject);
 var u,d,e: boolean; mt,nt: Tmp3MIDletType; mv,nv: Tmp3MIDPVersion; mr,nr: Tmp3RealNumbers;
 begin
-  TSpTBXSpinButton(Sender).IsHotTracking(u,d,e);
+  TtuiSpinButton(Sender).IsHotTracking(u,d,e);
   case FPropertiesPanelMode of
     ppmProject: ;
     ppmSourceFile: ;
@@ -747,13 +747,13 @@ procedure Tmp3ProjectManager.PopupMenuHandler(Sender: TObjecT);
     end;
   end;
 
-  function NewPopupItem(AAction: TAction): TSpTBXItem;
+  function NewPopupItem(AAction: TAction): TtuiMenuItem;
   begin
-    result := TSpTBXItem.Create(PopupMenu);
+    result := TtuiMenuItem.Create(PopupMenu);
     result.Action := AAction;
   end;
 
-var ANode: PVirtualNode; si: TSpTBXSeparatorItem; x,n,nl: integer; de,re: boolean;
+var ANode: PVirtualNode; si: TtuiSeparatorMenuItem; x,n,nl: integer; de,re: boolean;
 begin
   ANode := Tree.GetFirstSelected;
   if not assigned(ANode) then
@@ -761,7 +761,7 @@ begin
   RevertToBasePopupItems;
   nl := Tree.GetNodeLevel(ANode);
   if nl > 0 then begin
-    si := TSpTBXSeparatorItem.Create(PopupMenu);
+    si := TtuiSeparatorMenuItem.Create(PopupMenu);
     si.Tag := nl;
     PopupMenu.Items.Insert(0,si);
     if nl = 1 then begin
