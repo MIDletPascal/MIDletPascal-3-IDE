@@ -10,7 +10,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Forms, Math,
   Controls, StdCtrls, ComCtrls, Graphics, Grids,
-  SpTBXSkins, SpTBXTabs,
+  SpTBXTabs,
   TB2Dock,
   Diff, HashUnit,
   SynEdit,
@@ -21,7 +21,7 @@ uses
   SynEditAutoComplete, SynEditKeyCmds,
   SynEditHighlighter,
   gnugettext,
-  tuiFindDialog, tuiReplaceDialog, tuiControls,  
+  tuiFindDialog, tuiReplaceDialog, tuiControls,
   sitEditorFrame, sitSynCodeEditorStyle, sitSynCodeEditorStylePas,
   mp3FileKind, mp3Consts, mp3Settings;
 
@@ -135,6 +135,9 @@ type
 
 implementation
 
+uses
+  tuiColorManager;
+
 {$R *.dfm}
 
 { Tmp3CodeEditorFrame }
@@ -178,8 +181,8 @@ procedure Tmp3CodeEditorFrame.AfterConstruction;
       LeadingZeros := false;
       AutoSize := true;
       Gradient := true;
-      GradientStartColor := SkinManager.CurrentSkin.Options(skncGutter).Body.Color1;
-      GradientEndColor := SkinManager.CurrentSkin.Options(skncGutter).Body.Color2;
+      GradientStartColor := TurboUIColorManager.Getcolor(tccPanelGradientStart);
+      GradientEndColor := TurboUIColorManager.Getcolor(tccPanelGradientEnd);
       GradientSteps := 100;
     end;
 

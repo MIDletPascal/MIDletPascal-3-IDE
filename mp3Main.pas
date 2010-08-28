@@ -8,22 +8,12 @@ unit mp3Main;
 interface
 
 uses
-  Windows, Messages, SysUtils, Dialogs, StrUtils,
-  Classes, ImgList, Menus, ShellAPI, ExtCtrls,
-  Graphics, Forms, Controls, ActnList,
-  TB2Item, TB2Dock,
-  gnugettext, languagecodes,
+  Windows, Messages, Dialogs, Controls, ActnList,
+  Classes, ImgList, Menus, ExtCtrls, Forms,
   DosCommand,
   OtlTask, OtlTaskControl, OtlEventMonitor, OtlComm,
-  tuiItemWithLocationDialog, tuiItemWithSizeDialog, tuiControls,
-  SpTBXMessageDlg, SpTBXInputBox,
-  sitDelforObjectPascalFormatter, sitOSUtils, sitConsts,
-  sitGenericMainForm, sitCompilerMessagesPanel, sitEditorFrame,
-  mp3Consts, mp3FileKind, mp3Settings, mp3About, mp3ProjectBuilding,
-  mp3Group, mp3Project, mp3SourceFiles, mp3ResourceFiles,
-  mp3ProjectManager, mp3GroupManager,
-  mp3EmulatorsDialog, mp3CodeEditorStylesDialog,
-  mp3CodeEditorFrame, mp3MainFrame;
+  sitGenericMainForm, sitCompilerMessagesPanel,
+  mp3ProjectManager, mp3GroupManager, mp3MainFrame;
 
 const
   WM_PERFORMBUILD = WM_USER + $0888;
@@ -332,7 +322,16 @@ type
 implementation
 
 uses
-  mp3Core;
+  SysUtils, StrUtils, ShellAPI, Graphics, 
+  gnugettext, languagecodes,
+  SpTBXMessageDlg, SpTBXInputBox,
+  tuiItemWithLocationDialog, tuiItemWithSizeDialog, tuiControls, tuiColorManager,
+  sitOSUtils, sitConsts,
+  sitDelforObjectPascalFormatter, sitEditorFrame,
+  mp3Consts, mp3About, mp3ProjectBuilding, mp3Core,
+  mp3Group, mp3Project, mp3SourceFiles, mp3ResourceFiles,
+  mp3EmulatorsDialog, mp3CodeEditorStylesDialog,
+  mp3Settings, mp3CodeEditorFrame, mp3FileKind;
 
 {$R *.dfm}
 
@@ -341,7 +340,7 @@ var i: integer; ti: TtuiMenuItem; si: TtuiSeparatorMenuItem;
 begin
   inherited;
   KeyPreview := true;
-  SetSkin(DEFAULT_SKIN);
+  TurboUIColorManager.Skin := DEFAULT_SKIN;
   // web update related
   gCore.WebUpdate.OnDownloadProgress := OnDowloadProgress;
   FLastDownloadProgressMessageTickCount := GetTickCount;
