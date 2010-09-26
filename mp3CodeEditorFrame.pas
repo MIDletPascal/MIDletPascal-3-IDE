@@ -22,7 +22,7 @@ uses
   SynEditHighlighter,
   gnugettext,
   tuiFindDialog, tuiReplaceDialog, tuiControls,
-  sitEditorFrame, sitSynCodeEditorStyle, sitSynCodeEditorStylePas,
+  sitEditorFrame, sitSynRsRuler, sitSynCodeEditorStyle, sitSynCodeEditorStylePas,
   mp3FileKind, mp3Consts, mp3Settings;
 
 type
@@ -36,6 +36,7 @@ type
     FPreprocessSynEdit: TSynEdit;
     FHistoryContentsSynEdit: TSynEdit;
     FAutoComplete: TSynAutoComplete;
+    FOnCaretMove: TNotifyEvent;
     FOnPreprocess: TNotifyEvent;
     FOnHistory: TNotifyEvent;
     FOnOpenFileAtCursor: TNotifyEvent;
@@ -72,6 +73,7 @@ type
     FHistoryToolbar: TtuiToolbar;
     FHistoryRollbackButton: TtuiMenuItem;
     FHistorySendToBufferButton: TtuiMenuItem;
+    FRuler: TsitSynRsRuler;
     procedure GridDrawCell(Sender: TObject; ACol, ARow: Integer;
       Rect: TRect; State: TGridDrawState);
     procedure GridTopLeftChanged(Sender: TObject);
@@ -90,6 +92,9 @@ type
     function SortHistoricalItemsByIndex(AItems: string): string;
     procedure OnRollbackClick(Sender: TObject);
     procedure OnSendToBufferClick(Sender: TObject);
+    procedure WhenStatusChanges(Sender: TObject; Changes: TSynStatusChanges);
+  protected
+    procedure SetReadOnly(const Value: Boolean); override;
   public
     procedure AfterConstruction; override;
     procedure BeforeDestruction; override;
@@ -97,6 +102,7 @@ type
     procedure Save; override;
     procedure SaveAs(AFilename: string); override;
     procedure SetFocusOnEditor; override;
+    procedure GetCaretPosition(var AX: integer; var AY: integer); override;
     procedure GotoOffset(AOffset: integer); override;
     procedure Undo; override;
     procedure Redo; override;
@@ -116,6 +122,8 @@ type
     procedure SetHistoryTabVisibility(AValue: boolean);
     function GetWordAtCursor: string;
     function GetCurrentHistoricalVersion: integer;
+    procedure ToggleCommentInSelectedText;
+    procedure ToggleCommentInSelectedLines;
     property SynEdit: TSynEdit read FSynEdit;
     property Content: string
       read GetContent write SetContent;
@@ -131,6 +139,8 @@ type
       read FOnRollback write FOnRollback;
     property OnSendToBuffer: TNotifyEvent
       read FOnSendToBuffer write FOnSendToBuffer;
+    property OnCaretMove: TNotifyEvent
+      read FOnCaretMove write FOnCaretMove;
   end;
 
 implementation
@@ -173,6 +183,10 @@ procedure Tmp3CodeEditorFrame.AfterConstruction;
     FSynEdit.BookMarkOptions.EnableKeys := true;
     FSynEdit.OnChange := OnEditorChange;
     FSynEdit.OnKeyDown := OnEditorKeyDown;
+
+    FSynEdit.OnStatusChange := WhenStatusChanges;
+    // ruler
+    FRuler := NewSynRuler(FSynEdit, alTop, 21);
 
     // gutter set up
     with FSynEdit.Gutter do begin
@@ -382,7 +396,6 @@ begin
     end;
     //LoadFromFile(FSynEdit.Lines,Filename,GetEncoding(Filename,bom),bom);
   end;
-  FSynEdit.ReadOnly := ReadOnly;
 end;
 
 procedure Tmp3CodeEditorFrame.OnHistoryContentsComboBoxChange(Sender: TObject);
@@ -510,6 +523,17 @@ begin
   FDiff2StringGrid.ColWidths[1] := FDiff1StringGrid.ColWidths[1];
 end;
 
+procedure Tmp3CodeEditorFrame.GetCaretPosition(var AX, AY: integer);
+begin
+  if assigned(FSynEdit) then begin
+    AX := FSynEdit.CaretX;
+    AY := FSynEdit.CaretY;
+  end else begin
+    AX := 0;
+    AY := 0; 
+  end;
+end;
+
 function Tmp3CodeEditorFrame.GetContent: string;
 begin
   result := FSynEdit.Text;
@@ -612,6 +636,12 @@ end;
 procedure Tmp3CodeEditorFrame.SetPreprocessTabVisibility(AValue: boolean);
 begin
   FPreprocessTab.Visible := AValue;
+end;
+
+procedure Tmp3CodeEditorFrame.SetReadOnly(const Value: Boolean);
+begin
+  inherited;
+  FSynEdit.ReadOnly := Value;
 end;
 
 procedure Tmp3CodeEditorFrame.ShowFindDialog;
@@ -742,6 +772,7 @@ begin
   CopyStyle(FSynEdit, FHistoryContentsSynEdit);
   SetStringGridPreferences(FDiff1StringGrid);
   SetStringGridPreferences(FDiff2StringGrid);
+  FRuler.Refresh;
 end;
 
 procedure Tmp3CodeEditorFrame.GridDrawCell(Sender: TObject; ACol, ARow: Integer;
@@ -880,6 +911,83 @@ begin
   finally
     Screen.Cursor := crDefault;
   end;
+end;
+
+procedure Tmp3CodeEditorFrame.ToggleCommentInSelectedLines;
+
+  function ToggleLineComment(const ALineText: string): string;
+  const
+    LINE_COMMENT = '//';
+    LINE_COMMENT_SIZE = length(LINE_COMMENT);
+  begin
+    result := ALineText;
+    if System.Copy(TrimLeft(result), 1, LINE_COMMENT_SIZE) = LINE_COMMENT then
+      System.Delete(result, 1, LINE_COMMENT_SIZE)
+    else
+      result := LINE_COMMENT + result;
+  end;
+
+var a,b,i: integer;
+begin
+  with SynEdit do
+    if not SelAvail {Pos(#10, SelText) = 0} then begin
+      LineText := ToggleLineComment(LineText);
+    end else begin
+      a := BlockBegin.Line;
+      b := BlockEnd.Line;
+      if (BlockEnd.Char = 1) then
+        dec(b);
+      for i := a to b do
+        Lines[i-1] := ToggleLineComment(Lines[i-1]);
+    end;
+end;
+
+procedure Tmp3CodeEditorFrame.ToggleCommentInSelectedText;
+
+  procedure ToggleTextComment;
+  const
+    OPEN_COMMENT = '{';
+    CLOSE_COMMENT = '}';
+    OPEN_COMMENT_SIZE = length(OPEN_COMMENT);
+    CLOSE_COMMENT_SIZE = length(CLOSE_COMMENT);
+    FULL_COMMENT_SIZE = OPEN_COMMENT_SIZE + CLOSE_COMMENT_SIZE;
+    HALF_COMMENT_SIZE = FULL_COMMENT_SIZE div 2;
+  var s: string; a,b,l: integer;
+  begin
+    with SynEdit do begin
+      s := SelText;
+      a := SelStart;
+      b := SelEnd;
+      l := length(s);
+      if (System.Copy(s, 1, OPEN_COMMENT_SIZE) = OPEN_COMMENT) and
+         (System.Copy(s, l+1-CLOSE_COMMENT_SIZE, CLOSE_COMMENT_SIZE) = CLOSE_COMMENT) then
+      begin
+        s := System.Copy(s, HALF_COMMENT_SIZE+1, l-FULL_COMMENT_SIZE);
+        b := b - FULL_COMMENT_SIZE;
+      end else begin
+        s := OPEN_COMMENT+s+CLOSE_COMMENT;
+        b := b + FULL_COMMENT_SIZE;
+      end;
+      SelText := s;
+      SelStart := a;
+      SelEnd := b;
+    end;
+  end;
+  
+begin
+  with SynEdit do
+    if not SelAvail then
+      ToggleCommentInSelectedLines
+    else
+      if (ActiveSelectionMode <> smColumn) then
+        ToggleTextComment;
+end;
+
+procedure Tmp3CodeEditorFrame.WhenStatusChanges(Sender: TObject; Changes: TSynStatusChanges);
+begin
+  if (scCaretX in Changes) or (scCaretY in Changes) then
+    if Assigned(FOnCaretMove) then
+      FOnCaretMove(Self);
 end;
 
 end.

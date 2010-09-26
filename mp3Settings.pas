@@ -23,6 +23,8 @@ type
     FCodeEditorStyles: TsitSynCodeEditorStylesPas;
     FEmulators: TStringList;
     FCurrentEmulatorName: string;
+    FDefaultProjectLocation: string;
+    FCurrentSkin: string;
     FLibrariesDirectory: string;
     FStubsDirectory: string;
     FGroupManager: boolean;
@@ -54,6 +56,8 @@ type
     property HelpFile: string read GetHelpFile;
     property Emulators: TStringList read FEmulators;
     property CurrentEmulatorName: string read FCurrentEmulatorName write FCurrentEmulatorName;
+    property DefaultProjectLocation: string read FDefaultProjectLocation write FDefaultProjectLocation;
+    property CurrentSkin: string read FCurrentSkin write FCurrentSkin;
     property CurrentEmulatorCommandLine: string read GetCurrentEmulatorCommandLine;
     property LibrariesDirectory: string read FLibrariesDirectory;
     property StubsDirectory: string read FStubsDirectory;
@@ -160,6 +164,7 @@ end;
 
 procedure Tmp3Settings.Load;
 begin
+  FCurrentSkin := FIniFile.ReadString(CONFIG_IDE_SECTION,CONFIG_IDE_SECTION_SKIN,DEFAULT_SKIN);
   FGroupManager := StrToBool(FIniFile.ReadString(CONFIG_IDE_SECTION,
     CONFIG_IDE_SECTION_GROUPMANAGER,CONFIG_IDE_SECTION_GROUPMANAGER_DEFAULT));
   FProjectManager := StrToBool(FIniFile.ReadString(CONFIG_IDE_SECTION,
@@ -191,10 +196,14 @@ begin
     CONFIG_EMULATOR_SECTION_CURRENT_EMULATOR_NAME_DEFAULT+'='+CONFIG_EMULATOR_SECTION_COMMANDLINE_MP2_DEFAULT);
   FCurrentEmulatorName := FIniFile.ReadString(CONFIG_EMULATOR_SECTION,
     CONFIG_EMULATOR_SECTION_CURRENT_EMULATOR_NAME,CONFIG_EMULATOR_SECTION_CURRENT_EMULATOR_NAME_DEFAULT);
+  FDefaultProjectLocation := FIniFile.ReadString(CONFIG_OPTIONS_SECTION,
+    CONFIG_OPTIONS_SECTION_DEFAULTPROJECTLOCATION,DEFAULT_PROJECT_LOCATION);
 end;
 
 procedure Tmp3Settings.Save;
 begin
+  FIniFile.WriteString(CONFIG_IDE_SECTION,
+    CONFIG_IDE_SECTION_SKIN,FCurrentSkin);
   FIniFile.WriteString(CONFIG_IDE_SECTION,
     CONFIG_IDE_SECTION_GROUPMANAGER,BoolToStr(FGroupManager));
   FIniFile.WriteString(CONFIG_IDE_SECTION,
@@ -223,6 +232,8 @@ begin
     CONFIG_EMULATOR_SECTION_EMULATORS,FEmulators.DelimitedText);
   FIniFile.WriteString(CONFIG_EMULATOR_SECTION,
     CONFIG_EMULATOR_SECTION_CURRENT_EMULATOR_NAME,FCurrentEmulatorName);
+  FIniFile.WriteString(CONFIG_OPTIONS_SECTION,
+    CONFIG_OPTIONS_SECTION_DEFAULTPROJECTLOCATION,FDefaultProjectLocation);
   FIniFile.UpdateFile;
 end;
 

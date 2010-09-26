@@ -9,7 +9,8 @@ interface
 {$IFDEF FPC}
   //
 {$ELSE}
-  {$DEFINE MSXML}
+  //{$DEFINE MSXML}
+  {$DEFINE JCLXML}
 {$ENDIF}
 uses
   SysUtils, Classes, Variants,
@@ -18,6 +19,9 @@ uses
   {$ELSE}
   {$IFDEF MSXML}
   Forms, XMLDoc, XMLIntf, ActiveX,
+  {$ENDIF}
+  {$IFDEF JCLXML}
+  JclSimpleXML,
   {$ENDIF}
   {$ENDIF}
   mp3Project, mp3Consts;
@@ -310,7 +314,130 @@ begin
   finally
     result := true;
     //st.Free;
-    xml.Free;
+    if assigned(xml) then
+      xml.Free;
+  end;
+end;
+{$ENDIF}
+{$IFDEF JCLXML}
+function ReadProject(AProject: Tmp3Project): boolean;
+var xml: TJclSimpleXML; i, h: integer; cfg: string;
+begin
+  result := true;
+  xml := TJclSimpleXML.Create;
+  try
+    try
+      xml.LoadFromFile(AProject.Filename);
+    except
+      result := false;
+      exit;
+    end;
+    if not SameText(xml.Root.Name, TAG_PROJECT) then
+    begin
+      result := false;
+      exit;
+    end;
+    with xml.Root do
+    for h := 0 to Items.Count - 1 do
+      if Items[h].Name = TAG_MIDLET then begin
+        with Items[h] do begin
+          AProject.MidletInfo.Name := Properties.ItemNamed[TAG_MIDLET_NAME].Value;
+          AProject.MidletInfo.Vendor := Properties.ItemNamed[TAG_MIDLET_VENDOR].Value;
+          AProject.MidletInfo.Version := Properties.ItemNamed[TAG_MIDLET_VERSION].Value;
+          AProject.MidletInfo.Icon := Properties.ItemNamed[TAG_MIDLET_ICON].Value;
+        end;
+      end else if Items[h].Name = TAG_SOURCES then begin
+        with Items[h] do
+          for i := 0 to Items.Count - 1 do
+            if SameText(Items[i].Name,TAG_SOURCES_SOURCE) then
+              AProject.SourceFiles.Add(Items[i].Properties.ItemNamed[TAG_SOURCES_FILENAME].Value);
+      end else if Items[h].Name = TAG_RESOURCES then begin
+        with Items[h] do
+          for i := 0 to Items.Count - 1 do
+            if SameText(Items[i].Name,TAG_RESOURCES_RESOURCE) then
+            begin
+              cfg := '';
+              if Items[i].Properties.ItemNamed[TAG_RESOURCES_CONFIGURATION] <> nil then
+                cfg := Items[i].Properties.ItemNamed[TAG_RESOURCES_CONFIGURATION].Value;
+              if cfg = '' then
+                if Items[i].Properties.ItemNamed[TAG_RESOURCES_CONFIGURATIONS] <> nil then
+                  cfg := Items[i].Properties.ItemNamed[TAG_RESOURCES_CONFIGURATIONS].Value;
+              AProject.ResourceFiles.Add(Items[i].Properties.ItemNamed[TAG_RESOURCES_FILENAME].Value, cfg);
+            end;
+      end else if Items[h].Name = TAG_BUILDCONFIGS then
+        with Items[h] do
+          for i := 0 to Items.Count - 1 do
+            if SameText(Items[i].Name,TAG_BUILDCONFIGS_CONFIGURATION) then begin
+              with Items[i] do
+                AProject.BuildConfigurations.Add(
+                  Properties.ItemNamed[TAG_BUILDCONFIGS_CONFIGURATION_NAME].Value,
+                  Properties.ItemNamed[TAG_BUILDCONFIGS_CONFIGURATION_TYPE].Value,
+                  Properties.ItemNamed[TAG_BUILDCONFIGS_CONFIGURATION_VERSION].Value,
+                  Properties.ItemNamed[TAG_BUILDCONFIGS_CONFIGURATION_MATH].Value
+                );
+            end else if SameText(Items[i].Name,TAG_BUILDCONFIGS_ACTIVECONFIGURATION) then
+              AProject.BuildConfigurations.ActiveConfigurationIndex := StrToIntDef(
+                Items[i].Properties.ItemNamed[TAG_BUILDCONFIGS_ACTIVECONFIGURATION_INDEX].Value, 0
+              );
+  finally
+    if assigned(xml) then
+      xml.Free;
+  end;
+end;
+
+function WriteProject(AProject: Tmp3Project): boolean;
+var xml: TJclSimpleXML; i: integer;
+begin
+  xml := TJclSimpleXML.Create;
+  try
+    xml.Root.Name := TAG_PROJECT;
+    xml.IndentString := #9;
+    xml.Options := xml.Options + [sxoAutoIndent, sxoDoNotSaveProlog];
+    // write midlet info
+    with xml.Root.Items.Add(TAG_MIDLET).Properties do begin
+      Add(TAG_MIDLET_NAME, AProject.MidletInfo.Name);
+      Add(TAG_MIDLET_VENDOR, AProject.MidletInfo.Vendor);
+      Add(TAG_MIDLET_VERSION, AProject.MidletInfo.Version);
+      Add(TAG_MIDLET_ICON, AProject.MidletInfo.Icon);
+    end;
+    // write sources
+    with xml.Root.Items.Add(TAG_SOURCES) do begin
+      for i := 0 to AProject.SourceFiles.Count - 1 do
+        Items.Add(TAG_SOURCES_SOURCE).Properties.Add(TAG_SOURCES_FILENAME,
+          AProject.SourceFiles[i].Filename);
+    end;
+    // write resources
+    with xml.Root.Items.Add(TAG_RESOURCES) do begin
+      for i := 0 to AProject.ResourceFiles.Count - 1 do
+        with Items.Add(TAG_RESOURCES_RESOURCE) do begin
+          Properties.Add(TAG_SOURCES_FILENAME,
+            AProject.ResourceFiles[i].Filename);
+          Properties.Add(TAG_RESOURCES_CONFIGURATIONS,
+            AProject.ResourceFiles[i].Configurations);
+        end;
+    end;
+    // write build configurations
+    with xml.Root.Items.Add(TAG_BUILDCONFIGS) do begin
+      for i := 0 to AProject.BuildConfigurations.Count - 1 do
+        with Items.Add(TAG_BUILDCONFIGS_CONFIGURATION) do begin
+          Properties.Add(TAG_BUILDCONFIGS_CONFIGURATION_NAME,
+            AProject.BuildConfigurations[i].Name);
+          Properties.Add(TAG_BUILDCONFIGS_CONFIGURATION_TYPE,
+            AProject.BuildConfigurations[i].GetMidletTypeAsMP2ProjectValue);
+          Properties.Add(TAG_BUILDCONFIGS_CONFIGURATION_VERSION,
+            AProject.BuildConfigurations[i].GetMIDPVersionAsMP2ProjectValue);
+          Properties.Add(TAG_BUILDCONFIGS_CONFIGURATION_MATH,
+            AProject.BuildConfigurations[i].GetRealNumbersAsMP2ProjectValue);
+        end;
+      with Items.Add(TAG_BUILDCONFIGS_ACTIVECONFIGURATION) do
+        Properties.Add(TAG_BUILDCONFIGS_ACTIVECONFIGURATION_INDEX,
+          AProject.BuildConfigurations.ActiveConfigurationIndex);
+    end;
+    xml.SaveToFile(AProject.Filename);
+  finally
+    result := true;
+    if assigned(xml) then
+      xml.Free;
   end;
 end;
 {$ENDIF}

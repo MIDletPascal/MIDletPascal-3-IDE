@@ -9,7 +9,8 @@ interface
 {$IFDEF FPC}
   //
 {$ELSE}
-  {$DEFINE MSXML}
+  //{$DEFINE MSXML}
+  {$DEFINE JCLXML}
 {$ENDIF}
 uses
   SysUtils, Classes,
@@ -18,6 +19,9 @@ uses
   {$ELSE}
   {$IFDEF MSXML}
   Forms, XMLDoc, XMLIntf, ActiveX,
+  {$ENDIF}
+  {$IFDEF JCLXML}
+  JclSimpleXML,
   {$ENDIF}
   {$ENDIF}
   mp3Group, mp3Consts;
@@ -90,8 +94,10 @@ begin
     st.SaveToFile(AGroup.Filename);
   finally
     result := true;
-    st.Free;
-    xml.Free;
+    if assigned(st) then
+      st.Free;
+    if assigned(xml) then
+      xml.Free;
   end;
 end;
 {$ELSE}
@@ -149,8 +155,67 @@ begin
     st.SaveToFile(AGroup.Filename);
   finally
     result := true;
-    st.Free;
-    xml.Free;
+    if assigned(st) then
+      st.Free;
+    if assigned(xml) then
+      xml.Free;
+  end;
+end;
+{$ENDIF}
+{$IFDEF JCLXML}
+function ReadGroup(AGroup: Tmp3Group): boolean;
+var xml: TJclSimpleXML; i, h: integer;
+begin
+  result := true;
+  xml := TJclSimpleXML.Create;
+  try
+    try
+      xml.LoadFromFile(AGroup.Filename);
+    except
+      result := false;
+      exit;
+    end;
+    if not SameText(xml.Root.Name, TAG_GROUP) then
+    begin
+      result := false;
+      exit;
+    end;
+    for h := 0 to xml.Root.Items.Count - 1 do
+      if xml.Root.Items[h].Name = TAG_PROJECTS then
+        with xml.Root.Items[h] do
+          for i := 0 to Items.Count - 1 do
+            if SameText(Items[i].Name, TAG_PROJECTS_PROJECT) then
+              AGroup.Projects.Include(
+                Items[i].Properties.ItemNamed[TAG_PROJECTS_PROJECT_FILENAME].Value
+              );
+  finally
+    if assigned(xml) then
+      xml.Free;
+  end;
+end;
+
+function WriteGroup(AGroup: Tmp3Group): boolean;
+var xml: TJclSimpleXML; i: integer; st: TStringList;
+begin
+  xml := TJclSimpleXML.Create;
+  st := TStringList.Create;
+  try                             
+    xml.Root.Name := TAG_GROUP;
+    xml.IndentString := #9;
+    xml.Options := xml.Options + [sxoAutoIndent, sxoDoNotSaveProlog];
+    with xml.Root.Items.Add(TAG_PROJECTS) do
+      for i := 0 to AGroup.Projects.Count - 1 do
+        Items.Add(TAG_PROJECTS_PROJECT).Properties.Add(TAG_PROJECTS_PROJECT_FILENAME,
+          AGroup.Projects[i]);
+    st.Text := xml.XMLData;
+    st.Insert(0, XML_ENCODING_TAG);
+    st.SaveToFile(AGroup.Filename);
+  finally
+    result := true;
+    if assigned(st) then
+      st.Free;
+    if assigned(xml) then
+      xml.Free;
   end;
 end;
 {$ENDIF}

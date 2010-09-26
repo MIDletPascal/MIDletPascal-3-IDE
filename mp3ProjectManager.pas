@@ -13,7 +13,7 @@ uses
   ImgList, ActnList,
   VirtualTrees,
   gnugettext,
-  tuiControls,
+  tuiControls, tuiDialogs,
   sitFileUtils, sitDockableManagers,
   mp3Project, mp3BuildConfigurations, mp3Consts, mp3FileKind;
 
@@ -440,6 +440,9 @@ begin
   result := false;
   NewEmptyProject;
   fn := IncludeTrailingPathDelimiter(ALocation)+AName+EXTENSION_PROJECT;
+  if FileExists(fn) then
+    if not AskForConfirmation(_('Are you sure you want to overwrite it?')) then
+      exit;
   if FCurrentProject.New(fn) then
     result := FCurrentProject.Load(fn);
 end;

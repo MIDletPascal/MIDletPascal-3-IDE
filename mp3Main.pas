@@ -9,7 +9,7 @@ interface
 
 uses
   Windows, Messages, Dialogs, Controls, ActnList,
-  Classes, ImgList, Menus, ExtCtrls, Forms,
+  Classes, ImgList, Menus, ExtCtrls, Forms, Graphics,
   DosCommand,
   OtlTask, OtlTaskControl, OtlEventMonitor, OtlComm,
   sitGenericMainForm, sitCompilerMessagesPanel,
@@ -161,6 +161,16 @@ type
     FormatSeparator: TAction;
     actFormatSourceCode: TAction;
     ilLanguages: TImageList;
+    CommentSeparator: TAction;
+    actCommentSelectedText: TAction;
+    actCommentSelectedLines: TAction;
+    actSetDefaultProjectLocation: TAction;
+    SkinSeparator: TAction;
+    actSkin: TAction;
+    al_actSkin: TActionList;
+    DefaultSeparator: TAction;
+    imgReadOnly: TImage;
+    actOpenClassesFolder: TAction;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -236,6 +246,10 @@ type
     procedure actOpenSourceFolderExecute(Sender: TObject);
     procedure actOpenResourceFolderExecute(Sender: TObject);
     procedure actCheckForUpdatesExecute(Sender: TObject);
+    procedure actCommentSelectedTextExecute(Sender: TObject);
+    procedure actCommentSelectedLinesExecute(Sender: TObject);
+    procedure actSetDefaultProjectLocationExecute(Sender: TObject);
+    procedure actOpenClassesFolderExecute(Sender: TObject);
   private
     FBuilding: boolean;
     FBuildingGroup: boolean;
@@ -268,6 +282,7 @@ type
     procedure OnDoubleClickLine(Sender: TObject; ALine: string);
     procedure OnMainFramePopup(Sender: TObject);
     procedure OnSetCodeEditorStyle(Sender: TObject);
+    procedure OnCodeEditorCaretMove(Sender: TObject);
     procedure OnCodeEditorPreprocess(Sender: TObject);
     procedure OnCodeEditorHistory(Sender: TObject);
     procedure OnCodeEditorOpenFileAtCursor(Sender: TObject);
@@ -311,6 +326,9 @@ type
     procedure UpdateStatusBarText(AText: widestring = ' ');
     procedure OnInstallUpdateClick(Sender: TObject);
     procedure OnDropFileHandler(const AFilename: string);
+    procedure OnSkinExecute(Sender: TObject);
+    procedure RefreshSkins;
+    procedure RefreshStatusBarEditorInfo;
   public
     procedure Load(AFilename: string);
     procedure PerformBuild;
@@ -322,12 +340,13 @@ type
 implementation
 
 uses
-  SysUtils, StrUtils, ShellAPI, Graphics, 
+  SysUtils, StrUtils, ShellAPI, 
   gnugettext, languagecodes,
   SpTBXMessageDlg, SpTBXInputBox,
-  tuiItemWithLocationDialog, tuiItemWithSizeDialog, tuiControls, tuiColorManager,
-  sitOSUtils, sitConsts,
-  sitDelforObjectPascalFormatter, sitEditorFrame,
+  tuiItemWithLocationDialog, tuiItemWithSizeDialog, tuiControls,
+  tuiColorManager, tuiActionsUtils,
+  sitOSUtils, sitConsts, sitDelforObjectPascalFormatter,
+  sitEditorFrame, sitInformationBar,
   mp3Consts, mp3About, mp3ProjectBuilding, mp3Core,
   mp3Group, mp3Project, mp3SourceFiles, mp3ResourceFiles,
   mp3EmulatorsDialog, mp3CodeEditorStylesDialog,
@@ -340,7 +359,8 @@ var i: integer; ti: TtuiMenuItem; si: TtuiSeparatorMenuItem;
 begin
   inherited;
   KeyPreview := true;
-  TurboUIColorManager.Skin := DEFAULT_SKIN;
+  TtuiColorManager.AddSkinsFromFolder(gSettings.ConfigPath+'Skins');
+  sitInformationBar.SetReadOnlyPicture(imgReadOnly.Picture);
   // web update related
   gCore.WebUpdate.OnDownloadProgress := OnDowloadProgress;
   FLastDownloadProgressMessageTickCount := GetTickCount;
@@ -370,6 +390,7 @@ begin
   FMainFrame.CloseTabButton.ImageIndex := 20;
   FMainFrame.TabControl.OnActiveTabChange := OnActiveTabChange;
   FMainFrame.OnPopup := OnMainFramePopup;
+  FMainFrame.OnCodeEditorCaretMove := OnCodeEditorCaretMove;
   FMainFrame.OnCodeEditorPreprocess := OnCodeEditorPreprocess;
   FMainFrame.OnCodeEditorHistory := OnCodeEditorHistory;
   FMainFrame.OnCodeEditorOpenFileAtCursor := OnCodeEditorOpenFileAtCursor;
@@ -636,6 +657,11 @@ begin
   end;
 end;
 
+procedure Tmp3MainForm.OnCodeEditorCaretMove(Sender: TObject);
+begin
+  RefreshStatusBarEditorInfo;
+end;
+
 procedure Tmp3MainForm.OnCodeEditorGetHelpOnWord(Sender: TObject);
 var AProject: Tmp3Project; x: integer;
 begin
@@ -804,7 +830,6 @@ begin
   sf := Tmp3SourceFile(Sender);
   if assigned(sf) and sf.Exists then
     FMainFrame.NewCodeEditor(sf.GetFullname);
-  RefreshActions;
 end;
 
 procedure Tmp3MainForm.OnRunningEmulatorFinish(Sender: TObject;
@@ -829,6 +854,7 @@ end;
 procedure Tmp3MainForm.OnActiveTabChange(Sender: TObject; TabIndex: Integer);
 begin
   RefreshActions;
+  RefreshStatusBarEditorInfo;
 end;
 
 procedure Tmp3MainForm.SendToRecents(AFilename: string);
@@ -1121,6 +1147,12 @@ begin
     ShellExecute(0,'open','','',pchar(FProjectManager.CurrentProject.OutputDirectory),1);
 end;
 
+procedure Tmp3MainForm.actOpenClassesFolderExecute(Sender: TObject);
+begin
+  if FProjectManager.HasItemLoaded then
+    ShellExecute(0,'open','','',pchar(FProjectManager.CurrentProject.ClassesDirectory),1);
+end;
+
 procedure Tmp3MainForm.actOpenDemosFolderExecute(Sender: TObject);
 begin
   ShellExecute(0,'open',pchar(gSettings.ConfigPath+'Demos'),'','',1);
@@ -1314,6 +1346,12 @@ begin
     FMainFrame.CurrentEditor.SelectAll;
 end;
 
+procedure Tmp3MainForm.actSetDefaultProjectLocationExecute(Sender: TObject);
+begin
+  gSettings.DefaultProjectLocation := InputBox(_('Project Location'),
+    _('Please, enter a new value:'), gSettings.DefaultProjectLocation);
+end;
+
 procedure Tmp3MainForm.actSetFontExecute(Sender: TObject);
 begin
   dlgFont.Font.Name := gSettings.CodeEditorFontName;
@@ -1404,6 +1442,18 @@ procedure Tmp3MainForm.actReplaceTextExecute(Sender: TObject);
 begin
   if Assigned(FMainFrame.CurrentEditor)and(FMainFrame.CurrentEditor.Kind=ekCode) then
     Tmp3CodeEditorFrame(FMainFrame.CurrentEditor).ShowReplaceDialog;
+end;
+
+procedure Tmp3MainForm.actCommentSelectedLinesExecute(Sender: TObject);
+begin
+  if Assigned(FMainFrame.CurrentEditor)and(FMainFrame.CurrentEditor.Kind=ekCode) then
+    Tmp3CodeEditorFrame(FMainFrame.CurrentEditor).ToggleCommentInSelectedLines;
+end;
+
+procedure Tmp3MainForm.actCommentSelectedTextExecute(Sender: TObject);
+begin
+  if Assigned(FMainFrame.CurrentEditor)and(FMainFrame.CurrentEditor.Kind=ekCode) then
+    Tmp3CodeEditorFrame(FMainFrame.CurrentEditor).ToggleCommentInSelectedText;
 end;
 
 procedure Tmp3MainForm.actCompileCurrentFileExecute(Sender: TObject);
@@ -1639,7 +1689,7 @@ begin
   with TTurboUIItemWithLocationDialog.Create(Self) do
   try
     ItemName := DEFAULT_GROUP_NAME;
-    ItemLocation := DEFAULT_PROJECT_LOCATION;
+    ItemLocation := gSettings.DefaultProjectLocation;
     SetTitle(_('New Group')+'...');
     SetItemNameLabel(_('Group Name'));
     SetItemLocationLabel(_('Group Location'));
@@ -1652,6 +1702,7 @@ begin
   finally
     Free;
   end;
+  RefreshActions;
 end;
 
 procedure Tmp3MainForm.actNewImageExecute(Sender: TObject);
@@ -1677,7 +1728,7 @@ begin
   with TTurboUIItemWithLocationDialog.Create(Self) do
   try
     ItemName := DEFAULT_PROJECT_NAME;
-    ItemLocation := DEFAULT_PROJECT_LOCATION;
+    ItemLocation := gSettings.DefaultProjectLocation;
     SetTitle(_('New Project')+'...');
     SetItemNameLabel(_('Project Name'));
     SetItemLocationLabel(_('Project Location'));
@@ -1862,11 +1913,7 @@ end;
 procedure Tmp3MainForm.RefreshLanguageActions;
 var i: integer; action: TAction;
 begin
-  for i := al_actLanguage.ActionCount-1 downto 0 do begin
-    action := TAction(al_actLanguage.Actions[i]);
-    action.ActionList := nil;
-    action.Free;
-  end;
+  ClearActionList(al_actLanguage);
   action := TAction.Create(Self);
   action.Caption := getlanguagename(DEFAULT_LANGUAGE_CODE);
   action.OnExecute := OnLanguageClick;
@@ -1954,11 +2001,7 @@ end;
 procedure Tmp3MainForm.RefreshEmulators;
 var i: integer; action: TAction;
 begin
-  for i := al_actEmulators.ActionCount-1 downto 0 do begin
-    action := TAction(al_actEmulators.Actions[i]);
-    action.ActionList := nil;
-    action.Free;
-  end;
+  ClearActionList(al_actEmulators);
   // be sure current emulator exists
   if gSettings.Emulators.IndexOfName(gSettings.CurrentEmulatorName)=-1 then
     gSettings.CurrentEmulatorName := CONFIG_EMULATOR_SECTION_CURRENT_EMULATOR_NAME_DEFAULT;
@@ -1988,11 +2031,7 @@ end;
 procedure Tmp3MainForm.RefreshReopen;
 var i: integer; st: TStringList; action: TAction;
 begin
-  for i := al_actReopen.ActionCount-1 downto 0 do begin
-    action := TAction(al_actReopen.Actions[i]);
-    action.ActionList := nil;
-    action.Free;
-  end;
+  ClearActionList(al_actReopen);
   st := TStringList.Create;
   try
     gSettings.Recents.GetRecents(st);
@@ -2033,11 +2072,7 @@ end;
 procedure Tmp3MainForm.RefreshStyleActions;
 var i: integer; action: TAction; o: boolean;
 begin
-  for i := al_actCodeEditorStyle.ActionCount-1 downto 0 do begin
-    action := TAction(al_actCodeEditorStyle.Actions[i]);
-    action.ActionList := nil;
-    action.Free;
-  end;
+  ClearActionList(al_actCodeEditorStyle);
   o := false;
   gSettings.CodeEditorStyles.Refresh;
   for i := 0 to gSettings.CodeEditorStyles.List.Count - 1 do begin
@@ -2073,9 +2108,39 @@ begin
   action.ActionList := al_actCodeEditorStyle;
 end;
 
+procedure Tmp3MainForm.OnSkinExecute(Sender: TObject);
+begin
+  if assigned(Sender) and (Sender is TAction) then begin
+    TurboUIColorManager.Skin := TAction(Sender).Caption;
+    OnlyCheckThisActionInActionList(al_actSkin, TAction(Sender));
+  end;
+end;
+
+procedure Tmp3MainForm.RefreshSkins;
+var i: integer; action: TAction; st: TStringList; s: string;
+begin
+  ClearActionList(al_actSkin);
+  st := TStringList.Create;
+  try
+    TurboUIColorManager.GetAvailableSkins(st);
+    s := gSettings.CurrentSkin;
+    for i := 0 to st.Count - 1 do
+    begin
+      action := TAction.Create(Self);
+      action.Caption := st[i];
+      action.OnExecute := OnSkinExecute;
+      action.ActionList := al_actSkin;
+      action.Checked := SameText(st[i], s);
+    end;
+  finally
+    st.Free;
+  end;
+end;
+
 procedure Tmp3MainForm.RefreshSubmenus(AAvoidRetranslation: boolean = false);
 begin
   RefreshReopen;
+  RefreshSkins;
   RefreshEmulators;
   RefreshStyleActions;
   if AAvoidRetranslation then
@@ -2091,6 +2156,18 @@ begin
       MainMenu.EndUpdate;
     end;
   end;
+end;
+
+procedure Tmp3MainForm.RefreshStatusBarEditorInfo;
+var x, y: integer; s: string; ce: TsitEditorFrame;
+begin
+  s := ' ';
+  ce := FMainFrame.CurrentEditor;
+  if assigned(ce) and (ce.Kind = ekCode) then begin
+    ce.GetCaretPosition(x, y);
+    s := IntToStr(y)+' : '+IntToStr(x);
+  end;
+  StatusBarRightText.Caption := s;
 end;
 
 procedure Tmp3MainForm.RefreshTranslation;
@@ -2134,6 +2211,7 @@ end;
 
 procedure Tmp3MainForm.ReadSettings;
 begin
+  TurboUIColorManager.Skin := gSettings.CurrentSkin;
   if SameText(gSettings.ProjectManagerPosition,FMainFrame.DockRight.Name) then
     FProjectManager.Parent := FMainFrame.DockRight;
   if SameText(gSettings.GroupManagerPosition,FMainFrame.DockRight.Name) then
@@ -2150,6 +2228,7 @@ end;
 
 procedure Tmp3MainForm.WriteSettings;
 begin
+  gSettings.CurrentSkin := TurboUIColorManager.Skin;
   gSettings.GroupManager := actGroupManager.Checked;
   gSettings.ProjectManager := actProjectManager.Checked;
   gSettings.GroupManagerPosition := FGroupManager.Parent.Name;

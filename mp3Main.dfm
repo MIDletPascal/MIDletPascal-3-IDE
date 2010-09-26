@@ -16,6 +16,42 @@ object mp3MainForm: Tmp3MainForm
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
+  object imgReadOnly: TImage
+    Left = 182
+    Top = 264
+    Width = 16
+    Height = 16
+    AutoSize = True
+    Picture.Data = {
+      07544269746D617036030000424D360300000000000036000000280000001000
+      0000100000000100180000000000000300000000000000000000000000000000
+      000000FF00369DD93199D82C94D72890D6238CD51E88D41A84D31580D2117CD1
+      0E79D10A76D00773CF0470CF016ECE00FF0000FF003DA3DABCEBFABCEBFCBFEE
+      FEC6F4FFCEF8FFD3FAFFD0F8FFC7F2FFBAE9FCB3E4F9B0E2F8B0E2F80571CF00
+      FF0000FF0043A8DBBFECFB59CFF541B0EC4EBAEF5AC2EF60C6EF5CC4EF4CB6EF
+      37A5E62A9AE138B8EEB1E3F80975D000FF0000FF0049ADDCC1EEFB5FD3F76CDB
+      FC7FE5FF8FEDFF97F2FF93EDFF7CDFFF5BCCF846BEEF3CBAEEB3E3F90E79D100
+      FF0000FF004EB2DDC3EFFB65D6F84CB6EC5ABDEF95EBFF3097DD4D82AB84E1FF
+      41A9E9329FE142BEEFB4E5F9137ED200FF0000FF0053B7DEC6F0FC6AD9F87CE2
+      FD90E8FF99E9FF329FDF548BB28AE2FF6AD0F950C5F146C1F0B6E7F91883D300
+      FF0000FF0058BBDFC7F1FC6FDCF956BBED61BDEF9BE7FF35A6E24BA4E190E2FF
+      49ADE938A4E349C4F0B8E8F91E88D400FF0000FF005CBFE0C8F3FC75DFF989E6
+      FD95E7FF9AE5FFAAEEFFA8EDFF99E3FF74D5F959CCF34FC8F1BBE9FA248DD500
+      FF0000FF0060C2E1C9F3FCCBF3FDD4F6FED7F6FFD8F4FFE0F8FFDFF8FFDAF5FF
+      CDF1FCC2EDFABDEBFABDEBFA2B93D600FF0000FF0061C3E188A0A89191918E8E
+      8E5AB9DC55B8DF51B5DE4DB1DD49ADDC46A8D7787878767676657E8D3199D800
+      FF0000FF0000FF00757575C6C6C694949400FF0000FF0000FF0000FF0000FF00
+      00FF007D7D7DABABAB5A5A5A00FF0000FF0000FF0000FF006B6B6BC4C4C4A1A1
+      A100FF0000FF0000FF0000FF0000FF0000FF00898989A9A9A953535300FF0000
+      FF0000FF0000FF004A4A4ABABABABFBFBF84848400FF0000FF0000FF0000FF00
+      797979A8A8A89E9E9E39393900FF0000FF0000FF0000FF0000FF008A8A8AC4C4
+      C4BEBEBEA1A1A1969696939393979797AEAEAEAEAEAE71717100FF0000FF0000
+      FF0000FF0000FF0000FF0000FF008D8D8DBCBCBCCACACACCCCCCCACACAC2C2C2
+      ADADAD7A7A7A00FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF
+      005252527575757E7E7E7B7B7B6E6E6E4B4B4B00FF0000FF0000FF0000FF0000
+      FF00}
+    Transparent = True
+  end
   object alMainMenu: TActionList
     Images = ilMain
     Left = 8
@@ -239,6 +275,19 @@ object mp3MainForm: Tmp3MainForm
       ShortCut = 16449
       OnExecute = actSelectAllExecute
     end
+    object CommentSeparator: TAction
+      Caption = '-'
+    end
+    object actCommentSelectedText: TAction
+      Caption = 'Comment Selected &Text'
+      ShortCut = 16459
+      OnExecute = actCommentSelectedTextExecute
+    end
+    object actCommentSelectedLines: TAction
+      Caption = 'Comment Selected &Lines'
+      ShortCut = 16495
+      OnExecute = actCommentSelectedLinesExecute
+    end
     object FormatSeparator: TAction
       Caption = '-'
     end
@@ -284,6 +333,12 @@ object mp3MainForm: Tmp3MainForm
     end
     object actLanguage: TAction
       Caption = '&Language'
+    end
+    object SkinSeparator: TAction
+      Caption = '-'
+    end
+    object actSkin: TAction
+      Caption = '&Skin'
     end
     object FullScreenSeparator: TAction
       Caption = '-'
@@ -1331,6 +1386,13 @@ object mp3MainForm: Tmp3MainForm
     object actEmulators: TAction
       Caption = 'Emulators'
     end
+    object DefaultSeparator: TAction
+      Caption = '-'
+    end
+    object actSetDefaultProjectLocation: TAction
+      Caption = 'Set Default Project &Location...'
+      OnExecute = actSetDefaultProjectLocationExecute
+    end
   end
   object al_actEmulators: TActionList
     Left = 168
@@ -1383,6 +1445,10 @@ object mp3MainForm: Tmp3MainForm
       Caption = 'Open S&cripts Folder'
       OnExecute = actOpenScriptsFolderExecute
     end
+    object actOpenClassesFolder: TAction
+      Caption = 'Open C&lasses Folder'
+      OnExecute = actOpenClassesFolderExecute
+    end
     object ProjecFoldertSeparator: TAction
       Caption = '-'
     end
@@ -1400,5 +1466,9 @@ object mp3MainForm: Tmp3MainForm
     Height = 11
     Left = 424
     Top = 264
+  end
+  object al_actSkin: TActionList
+    Left = 104
+    Top = 104
   end
 end

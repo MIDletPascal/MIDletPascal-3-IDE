@@ -13,7 +13,7 @@ uses
   ImgList, ActnList,
   VirtualTrees,
   gnugettext,
-  tuiControls,
+  tuiControls, tuiDialogs,
   sitDockableManagers,
   mp3Group, mp3Consts, mp3FileKind;
 
@@ -46,6 +46,7 @@ type
     procedure NewEmptyGroup;
     function GetSelectedItemName: string;
     procedure SetActiveProject(const Value: string);
+  protected
     procedure CustomizeTree; override;
     procedure PerformRefresh; override;
   public
@@ -55,7 +56,7 @@ type
     procedure Load(AFilename: string); override;
     procedure Save(ARefresh: boolean = True); override;
     procedure Close; override;
-    function HasItemLoaded: boolean;
+    function HasItemLoaded: boolean; override;
     procedure ExecuteCurrentElement;
     property CurrentGroup: Tmp3Group read FCurrentGroup;
     property ActiveProject: string read FActiveProject write SetActiveProject;
@@ -301,6 +302,9 @@ begin
   result := false;
   NewEmptyGroup;
   fn := IncludeTrailingPathDelimiter(ALocation)+AName+EXTENSION_GROUP;
+  if FileExists(fn) then
+    if not AskForConfirmation(_('Are you sure you want to overwrite it?')) then
+      exit;
   if FCurrentGroup.New(fn) then
     result := FCurrentGroup.Load(fn);
   FActiveProject := '';

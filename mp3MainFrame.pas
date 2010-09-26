@@ -24,6 +24,8 @@ type
     FOnCodeEditorGetHelpOnWord: TNotifyEvent;
     FOnCodeEditorRollback: TNotifyEvent;
     FOnCodeEditorSendToBuffer: TNotifyEvent;
+    FOnCodeEditorCaretMove: TNotifyEvent;
+    procedure OnCodeCaretMove(Sender: TObject);
     procedure OnCodeGetHelpOnWord(Sender: TObject);
     procedure OnCodeOpenFileAtCursor(Sender: TObject);
     procedure OnCodeRollback(Sender: TObject);
@@ -42,6 +44,8 @@ type
     procedure NewImageEditor(AFilename: string = '';
       AWidth: integer = 12; AHeight: integer = 12; ANew: boolean = false);
     procedure GotoSourceFileLine(const AFilename: string; ALine: Integer);
+    property OnCodeEditorCaretMove: TNotifyEvent
+      read FOnCodeEditorCaretMove write FOnCodeEditorCaretMove;
     property OnCodeEditorPreprocess: TNotifyEvent
       read FOnCodeEditorPreprocess write FOnCodeEditorPreprocess;
     property OnCodeEditorHistory: TNotifyEvent
@@ -110,6 +114,7 @@ begin
   if CheckAlreadyBeingEdited(AFilename,ekCode) then
     exit;
   codeEditor := Tmp3CodeEditorFrame(NewEditor(ekCode));
+  codeEditor.OnCaretMove := OnCodeCaretMove;
   codeEditor.OnPreprocess := OnCodePreprocess;
   codeEditor.OnOpenFileAtCursor := OnCodeOpenFileAtCursor;
   codeEditor.OnGetHelpOnWord := OnCodeGetHelpOnWord;
@@ -167,6 +172,12 @@ begin
     CurrentEditor.SetFocusOnEditor;
   except
   end;
+end;
+
+procedure Tmp3MainFrame.OnCodeCaretMove(Sender: TObject);
+begin
+  if assigned(FOnCodeEditorCaretMove) then
+    FOnCodeEditorCaretMove(Sender);
 end;
 
 procedure Tmp3MainFrame.OnCodeGetHelpOnWord(Sender: TObject);
