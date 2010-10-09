@@ -1,8 +1,6 @@
 (*
-    MIDletPascal 3.0 Command Line Group Manager
+    MIDletPascal 3.x Preprocessor
     by Javier Santo Domingo (j-a-s-d@users.sourceforge.net)
-
-    18-11-2009
 *)
 
 library mp3PP;
@@ -12,21 +10,23 @@ uses
   FastMM4,
   sitJEDIPascalPreprocessor;
 
-const
-  WARNING_PP_GENERATED =
-    '{************************************************************************}'#13#10+
-    '{     WARNING: This is a MIDletPascal 3 preprocessor generated unit.     }'#13#10+
-    '{************************************************************************}'#13#10;
-
 type
   TCompilerMessageHandler = procedure(AMessage: pchar); cdecl;
 
 function preprocess(ARootDirectory, AFilename, AOutputFilename,
   AConditionalDefinesCSV: pchar; ACompilerMessageHandler: DWORD): DWORD; stdcall;
-var s: string; cmh: TCompilerMessageHandler;
+var s, w: string; cmh: TCompilerMessageHandler;
 begin
+  w := '(*--------------------------------------------------------------------------'#13#10+
+    '  WARNING'#13#10+
+    '  This is a MIDletPascal 3 preprocessor generated unit.'#13#10+
+    #13#10+
+    '  CONDITIONAL DEFINES'#13#10+
+    '  '+ AConditionalDefinesCSV +#13#10+
+    '  --------------------------------------------------------------------------*)'#13#10;
+
   result := PreprocessPascalFile(ARootDirectory, AFilename, AOutputFilename,
-    AConditionalDefinesCSV, WARNING_PP_GENERATED, s);
+    AConditionalDefinesCSV, pchar(w), s);
   if (result = 0) and (s <> '') then begin
     cmh := TCompilerMessageHandler(ACompilerMessageHandler);
     if assigned(cmh) then

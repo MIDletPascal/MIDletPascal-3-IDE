@@ -171,6 +171,7 @@ type
     DefaultSeparator: TAction;
     imgReadOnly: TImage;
     actOpenClassesFolder: TAction;
+    actMinimizeToTray: TAction;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -250,6 +251,7 @@ type
     procedure actCommentSelectedLinesExecute(Sender: TObject);
     procedure actSetDefaultProjectLocationExecute(Sender: TObject);
     procedure actOpenClassesFolderExecute(Sender: TObject);
+    procedure actMinimizeToTrayExecute(Sender: TObject);
   private
     FBuilding: boolean;
     FBuildingGroup: boolean;
@@ -340,12 +342,12 @@ type
 implementation
 
 uses
-  SysUtils, StrUtils, ShellAPI, 
+  SysUtils, StrUtils, ShellAPI,
   gnugettext, languagecodes,
   SpTBXMessageDlg, SpTBXInputBox,
   tuiItemWithLocationDialog, tuiItemWithSizeDialog, tuiControls,
-  tuiColorManager, tuiActionsUtils,
-  sitOSUtils, sitConsts, sitDelforObjectPascalFormatter,
+  tuiColorManager, tuiActionsUtils, tuiDialogs,
+  sitOSUtils, sitDirUtils, sitConsts, sitDelforObjectPascalFormatter,
   sitEditorFrame, sitInformationBar,
   mp3Consts, mp3About, mp3ProjectBuilding, mp3Core,
   mp3Group, mp3Project, mp3SourceFiles, mp3ResourceFiles,
@@ -1004,6 +1006,12 @@ begin
   RefreshStyleActions;
 end;
 
+procedure Tmp3MainForm.actMinimizeToTrayExecute(Sender: TObject);
+begin
+  actMinimizeToTray.Checked := not actMinimizeToTray.Checked;
+  gSettings.MinimizeToTray := actMinimizeToTray.Checked;
+end;
+
 procedure Tmp3MainForm.OnDowloadProgress(ADownloadedBytes: integer);
 begin
   Application.ProcessMessages;
@@ -1347,9 +1355,13 @@ begin
 end;
 
 procedure Tmp3MainForm.actSetDefaultProjectLocationExecute(Sender: TObject);
+var s: string;
 begin
-  gSettings.DefaultProjectLocation := InputBox(_('Project Location'),
-    _('Please, enter a new value:'), gSettings.DefaultProjectLocation);
+  s := InputBox(_('Project Location'), _('Please, enter a new value:'), gSettings.DefaultProjectLocation);
+  if IsValidPath(s) then
+    gSettings.DefaultProjectLocation := s
+  else
+    ShowError(_('You have entered a invalid path.'));
 end;
 
 procedure Tmp3MainForm.actSetFontExecute(Sender: TObject);
@@ -1973,7 +1985,7 @@ begin
     Free;
   end;
   FMainFrame.RefreshCodeEditorStyle;
-  RefreshSubmenus;
+  RefreshSubmenus(true);
 end;
 
 procedure Tmp3MainForm.OnManageEmulatorsExecute(Sender: TObject);
@@ -2164,7 +2176,7 @@ begin
   s := ' ';
   ce := FMainFrame.CurrentEditor;
   if assigned(ce) and (ce.Kind = ekCode) then begin
-    ce.GetCaretPosition(x, y);
+    Tmp3CodeEditorFrame(ce).GetCaretPosition(x, y);
     s := IntToStr(y)+' : '+IntToStr(x);
   end;
   StatusBarRightText.Caption := s;
@@ -2211,6 +2223,7 @@ end;
 
 procedure Tmp3MainForm.ReadSettings;
 begin
+  actMinimizeToTray.Checked := gSettings.MinimizeToTray;
   TurboUIColorManager.Skin := gSettings.CurrentSkin;
   if SameText(gSettings.ProjectManagerPosition,FMainFrame.DockRight.Name) then
     FProjectManager.Parent := FMainFrame.DockRight;

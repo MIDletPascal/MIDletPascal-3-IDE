@@ -34,6 +34,7 @@ type
     FLeftDockWidth: integer;
     FRightDockWidth: integer;
     FFullScreen: boolean;
+    FMinimizeToTray: boolean;
     FMaxBackups: integer;
     FLanguage: string;
     FCodeEditorStyle: string;
@@ -73,6 +74,7 @@ type
     property LeftDockWidth: integer read FLeftDockWidth write FLeftDockWidth;
     property RightDockWidth: integer read FRightDockWidth write FRightDockWidth;
     property FullScreen: boolean read FFullScreen write FFullScreen;
+    property MinimizeToTray: boolean read FMinimizeToTray write FMinimizeToTray;
     property MaxBackups: integer read FMaxBackups write FMaxBackups;
     property Recents: TsitMRUIni read FRecents;
   end;
@@ -179,6 +181,8 @@ begin
     CONFIG_IDE_SECTION_RIGHTDOCK_WIDTH,CONFIG_IDE_SECTION_RIGHTDOCK_WIDTH_DEFAULT));
   FFullScreen := StrToBool(FIniFile.ReadString(CONFIG_IDE_SECTION,
     CONFIG_IDE_SECTION_FULLSCREEN,CONFIG_IDE_SECTION_FULLSCREEN_DEFAULT));
+  FMinimizeToTray := StrToBool(FIniFile.ReadString(CONFIG_IDE_SECTION,
+    CONFIG_IDE_SECTION_MINIMIZETOTRAY,CONFIG_IDE_SECTION_MINIMIZETOTRAY_DEFAULT));
   FMaxBackups := FIniFile.ReadInteger(CONFIG_IDE_SECTION,
     CONFIG_IDE_SECTION_MAXBACKUPS,CONFIG_IDE_SECTION_MAXBACKUPS_DEFAULT);
   FLanguage := FIniFile.ReadString(CONFIG_IDE_SECTION,
@@ -218,6 +222,8 @@ begin
     CONFIG_IDE_SECTION_RIGHTDOCK_WIDTH,IntToStr(FRightDockWidth));
   FIniFile.WriteString(CONFIG_IDE_SECTION,
     CONFIG_IDE_SECTION_FULLSCREEN,BoolToStr(FFullScreen));
+  FIniFile.WriteString(CONFIG_IDE_SECTION,
+    CONFIG_IDE_SECTION_MINIMIZETOTRAY,BoolToStr(FMinimizeToTray));
   FIniFile.WriteInteger(CONFIG_IDE_SECTION,
     CONFIG_IDE_SECTION_MAXBACKUPS,FMaxBackups);
   FIniFile.WriteString(CONFIG_IDE_SECTION,

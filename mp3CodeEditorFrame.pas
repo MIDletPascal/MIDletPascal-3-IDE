@@ -93,6 +93,7 @@ type
     procedure OnRollbackClick(Sender: TObject);
     procedure OnSendToBufferClick(Sender: TObject);
     procedure WhenStatusChanges(Sender: TObject; Changes: TSynStatusChanges);
+    function GetWhatText: string;
   protected
     procedure SetReadOnly(const Value: Boolean); override;
   public
@@ -102,7 +103,6 @@ type
     procedure Save; override;
     procedure SaveAs(AFilename: string); override;
     procedure SetFocusOnEditor; override;
-    procedure GetCaretPosition(var AX: integer; var AY: integer); override;
     procedure GotoOffset(AOffset: integer); override;
     procedure Undo; override;
     procedure Redo; override;
@@ -120,6 +120,7 @@ type
     procedure SetColorSpeedSetting(AColorSetting: string);
     procedure SetPreprocessTabVisibility(AValue: boolean);
     procedure SetHistoryTabVisibility(AValue: boolean);
+    procedure GetCaretPosition(var AX: integer; var AY: integer);
     function GetWordAtCursor: string;
     function GetCurrentHistoricalVersion: integer;
     procedure ToggleCommentInSelectedText;
@@ -644,14 +645,26 @@ begin
   FSynEdit.ReadOnly := Value;
 end;
 
+function Tmp3CodeEditorFrame.GetWhatText: string;
+var s: string;
+begin
+  result := '';  // 0. nothing by default
+  if FSynEdit.SelText <> '' then
+    result := FSynEdit.SelText  // 1. selected text
+  else begin
+    s := GetWordAtCursor;
+    if s <> '' then
+      result := s  // 2. word at current position
+    else
+      result := FSearchText; // 3. last stored what field text
+  end;
+end;
+
 procedure Tmp3CodeEditorFrame.ShowFindDialog;
 begin
   with TTurboUIFindDialog.Create(Self) do
   try
-    if FSynEdit.SelText <> '' then
-      FindWhat := FSynEdit.SelText
-    else
-      FindWhat := FSearchText;
+    FindWhat := GetWhatText;
     WholeWords := FSearchWholeWords;
     CaseSensitive := FSearchCaseSensitive;
     RegularExpressions := FSynEdit.SearchEngine = FSearchRegex;
@@ -674,18 +687,16 @@ procedure Tmp3CodeEditorFrame.ShowReplaceDialog;
 begin
   with TTurboUIReplaceDialog.Create(Self) do
   try
-    if FSynEdit.SelText <> '' then
-      ReplaceWhat := FSynEdit.SelText
-    else
-      ReplaceWhat := FSearchText;
+    ReplaceWhat := GetWhatText;
     ReplaceWith := '';
     CaseSensitive := FSearchCaseSensitive;
-    if ShowModal=mrOk then begin
+    while ShowModal<>mrCancel do begin
       FSynEdit.SearchEngine := FSearch;    
       FSearchCaseSensitive := CaseSensitive;
       FSearchText := ReplaceWhat;
       FReplaceText := ReplaceWith;
       FReplaceAll := ReplaceAll;
+      FSearchWholeWords := WholeWords;
       DoSearchReplaceText(false,true);
     end;
   finally
@@ -703,10 +714,10 @@ begin
     AReplaceText := FReplaceText;
   end else begin
     Options := [];
-    if FSearchWholeWords then
-      Include(Options, ssoWholeWord);
     AReplaceText := '';
   end;
+  if FSearchWholeWords then
+    Include(Options, ssoWholeWord);
   if ABackwards then
     Include(Options, ssoBackwards);
   if FSearchCaseSensitive then

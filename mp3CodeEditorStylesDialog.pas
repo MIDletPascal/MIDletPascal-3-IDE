@@ -8,7 +8,7 @@ unit mp3CodeEditorStylesDialog;
 interface
 
 uses
-  Forms, Controls, Graphics,
+  Forms, Controls, Graphics, SysUtils,
   tuiForm, tuiUtils, tuiItemWithStringValueDialog, tuiDialog, tuiControls,
   SpTBXMessageDlg, SpTBXInputBox,
   gnugettext,
@@ -22,10 +22,12 @@ type
     FCodeEditorStylesListBox: TtuiListBox;
     FAddButton: TtuiButton;
     FEditButton: TtuiButton;
+    FRenameButton: TtuiButton;
     FDeleteButton: TtuiButton;
     FCloseButton: TtuiButton;
     procedure OnAddClick(Sender: TObject);
     procedure OnEditClick(Sender: TObject);
+    procedure OnRenameClick(Sender: TObject);
     procedure OnDeleteClick(Sender: TObject);
     procedure OnCodeEditorStylesListDoubleClick(Sender: TObject);
     procedure RefreshCodeEditorStyles;
@@ -69,8 +71,13 @@ begin
         .SetHeight(24).SetWidth(TUI_DIALOG_BUTTON_WIDTH + 8).SetCursor(crHandPoint)
         .GetInstance(FEditButton)
       .GetFactory
-        .NewButton.SetCaption(_('Delete')).SetOnclick(OnDeleteClick)
+        .NewButton.SetCaption(_('Rename')).SetOnclick(OnRenameClick)
         .SetTop(FEditButton.Top + FEditButton.Height + TUI_DIALOG_BUTTON_SEPARATION).SetLeft(FEditButton.Left)
+        .SetHeight(24).SetWidth(TUI_DIALOG_BUTTON_WIDTH + 8).SetCursor(crHandPoint)
+        .GetInstance(FRenameButton)
+      .GetFactory
+        .NewButton.SetCaption(_('Delete')).SetOnclick(OnDeleteClick)
+        .SetTop(FRenameButton.Top + FRenameButton.Height + TUI_DIALOG_BUTTON_SEPARATION).SetLeft(FRenameButton.Left)
         .SetHeight(24).SetWidth(TUI_DIALOG_BUTTON_WIDTH + 8).SetCursor(crHandPoint)
         .GetInstance(FDeleteButton);
     end;
@@ -108,6 +115,21 @@ begin
   if isActive then
     gSettings.CodeEditorStyle := theName;
   RefreshCodeEditorStyles;
+end;
+
+procedure Tmp3CodeEditorStylesDialog.OnRenameClick(Sender: TObject);
+var theName, newName: string;
+begin
+  if FCodeEditorStylesListBox.ItemIndex = -1 then
+    exit;
+  theName := gSettings.CodeEditorStyles.List[FCodeEditorStylesListBox.ItemIndex];
+  newName := InputBox(_('Rename'), _('Enter the new name:'), theName);
+  if (newName <> '') and (newName <> theName) then begin
+    gSettings.CodeEditorStyles.Rename(theName, newName);
+    if SameText(gSettings.CodeEditorStyle, theName) then
+      gSettings.CodeEditorStyle := newName;
+    RefreshCodeEditorStyles;
+  end;
 end;
 
 procedure Tmp3CodeEditorStylesDialog.OnCodeEditorStylesListDoubleClick(Sender: TObject);

@@ -1,5 +1,5 @@
 (*
-    MIDletPascal 3.0 Command Line Project Manager
+    MIDletPascal 3.x Command Line Project Manager
     by Javier Santo Domingo (j-a-s-d@users.sourceforge.net)
 
     2009 november 02 - started coding

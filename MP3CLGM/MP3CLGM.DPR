@@ -1,5 +1,5 @@
 (*
-    MIDletPascal 3.0 Command Line Group Manager
+    MIDletPascal 3.x Command Line Group Manager
     by Javier Santo Domingo (j-a-s-d@users.sourceforge.net)
 
     2009 december 24 - started coding

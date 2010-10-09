@@ -348,6 +348,10 @@ object mp3MainForm: Tmp3MainForm
       ShortCut = 122
       OnExecute = actFullScreenExecute
     end
+    object actMinimizeToTray: TAction
+      Caption = '&Minimize To Tray'
+      OnExecute = actMinimizeToTrayExecute
+    end
   end
   object ilMain: TImageList
     DrawingStyle = dsTransparent
