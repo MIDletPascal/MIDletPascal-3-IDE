@@ -39,50 +39,47 @@ implementation
 
 procedure Tmp3CodeEditorStylesDialog.FormCreate(Sender: TObject);
 begin
-  SetTitle(_('Code Editor Styles Management'));
   with ControlFactory do
     with NewFactory(NewPanel.SetAlign(alClient).SetBorders(false).GetInstance) do begin
-        NewLabel.SetCaption(_('Styles')).SetFontStyle([fsBold])
+        NewLabel(FCodeEditorStylesLabel).SetCaption(_('Styles')).SetFontStyle([fsBold])
         .SetTop(16).SetLeft(TUI_DIALOG_HORIZONTAL_MARGIN)
         .SetHeight(16).SetWidth(80)
-        .GetInstance(FCodeEditorStylesLabel)
       .GetFactory
-        .NewListBox
+        .NewListBox(FCodeEditorStylesListBox)
         .SetTop(FCodeEditorStylesLabel.Top + FCodeEditorStylesLabel.Height + 4).SetLeft(TUI_DIALOG_HORIZONTAL_MARGIN)
         .SetHeight(128).SetWidth(TitleBar.Width -
           (TUI_DIALOG_HORIZONTAL_MARGIN * 2) - TUI_DIALOG_BUTTON_WIDTH - TUI_DIALOG_BUTTON_SEPARATION)
         .SetCursor(crHandPoint).SetOnDblClick(OnCodeEditorStylesListDoubleClick)
-        .GetInstance(FCodeEditorStylesListBox)
       .GetFactory
-        .NewButton.SetCaption(_('Close')).SetDefault(true).SetModalResult(mrOk)
+        .NewButton(FCloseButton).SetCaption(_('Close')).SetDefault(true).SetModalResult(mrOk)
         .SetTop(FCodeEditorStylesListBox.Top + FCodeEditorStylesListBox.Height +
           (TUI_DIALOG_BUTTON_SEPARATION * 2)).SetLeft(TUI_DIALOG_HORIZONTAL_MARGIN)
         .SetHeight(24).SetWidth(TUI_DIALOG_BUTTON_WIDTH).SetCursor(crHandPoint)
-        .GetInstance(FCloseButton)
       .GetFactory
-        .NewButton.SetCaption(_('Add')).SetOnclick(OnAddClick)
+        .NewButton(FAddButton).SetCaption(_('Add')).SetOnclick(OnAddClick)
         .SetTop(FCodeEditorStylesListBox.Top).SetLeft(FCodeEditorStylesListBox.Left +
            FCodeEditorStylesListBox.Width + TUI_DIALOG_BUTTON_SEPARATION)
         .SetHeight(24).SetWidth(TUI_DIALOG_BUTTON_WIDTH + 8).SetCursor(crHandPoint)
-        .GetInstance(FAddButton)
       .GetFactory
-        .NewButton.SetCaption(_('Edit')).SetOnclick(OnEditClick)
+        .NewButton(FEditButton).SetCaption(_('Edit')).SetOnclick(OnEditClick)
         .SetTop(FAddButton.Top + FAddButton.Height + TUI_DIALOG_BUTTON_SEPARATION).SetLeft(FAddButton.Left)
         .SetHeight(24).SetWidth(TUI_DIALOG_BUTTON_WIDTH + 8).SetCursor(crHandPoint)
-        .GetInstance(FEditButton)
       .GetFactory
-        .NewButton.SetCaption(_('Rename')).SetOnclick(OnRenameClick)
+        .NewButton(FRenameButton).SetCaption(_('Rename')).SetOnclick(OnRenameClick)
         .SetTop(FEditButton.Top + FEditButton.Height + TUI_DIALOG_BUTTON_SEPARATION).SetLeft(FEditButton.Left)
         .SetHeight(24).SetWidth(TUI_DIALOG_BUTTON_WIDTH + 8).SetCursor(crHandPoint)
-        .GetInstance(FRenameButton)
       .GetFactory
-        .NewButton.SetCaption(_('Delete')).SetOnclick(OnDeleteClick)
+        .NewButton(FDeleteButton).SetCaption(_('Delete')).SetOnclick(OnDeleteClick)
         .SetTop(FRenameButton.Top + FRenameButton.Height + TUI_DIALOG_BUTTON_SEPARATION).SetLeft(FRenameButton.Left)
-        .SetHeight(24).SetWidth(TUI_DIALOG_BUTTON_WIDTH + 8).SetCursor(crHandPoint)
-        .GetInstance(FDeleteButton);
+        .SetHeight(24).SetWidth(TUI_DIALOG_BUTTON_WIDTH + 8).SetCursor(crHandPoint);
     end;
-  Height := FCloseButton.Top + FCloseButton.Height + (TUI_DIALOG_VERTICAL_MARGIN * 2);
-  Width := Width + (TUI_DIALOG_HORIZONTAL_MARGIN div 2);
+  SetTitle(
+    _('Code Editor Styles Management')
+  );
+  SetSize(
+    Width + (TUI_DIALOG_HORIZONTAL_MARGIN div 2),
+    FCloseButton.Top + FCloseButton.Height + (TUI_DIALOG_VERTICAL_MARGIN * 2)
+  );
   RefreshCodeEditorStyles;
 end;
 

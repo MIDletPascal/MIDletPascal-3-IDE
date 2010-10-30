@@ -74,6 +74,7 @@ type
     FHistoryRollbackButton: TtuiMenuItem;
     FHistorySendToBufferButton: TtuiMenuItem;
     FRuler: TsitSynRsRuler;
+    FTabControlText : TtuiLabel;
     procedure GridDrawCell(Sender: TObject; ACol, ARow: Integer;
       Rect: TRect; State: TGridDrawState);
     procedure GridTopLeftChanged(Sender: TObject);
@@ -120,6 +121,7 @@ type
     procedure SetColorSpeedSetting(AColorSetting: string);
     procedure SetPreprocessTabVisibility(AValue: boolean);
     procedure SetHistoryTabVisibility(AValue: boolean);
+    procedure SetTabControlText(const AValue: widestring);
     procedure GetCaretPosition(var AX: integer; var AY: integer);
     function GetWordAtCursor: string;
     function GetCurrentHistoricalVersion: integer;
@@ -335,6 +337,16 @@ procedure Tmp3CodeEditorFrame.AfterConstruction;
     InitDiffTab;
   end;
 
+  procedure InitTabControlText;
+  begin
+    FTabControl.Items.Add(TtuiRightAlignSpacerItem.Create(Self));
+    FTabControlText := TtuiLabel.Create(Self);
+    FTabControlText.Parent := FTabControl.Toolbar;
+    FTabControlText.Alignment := taRightJustify;
+    FTabControlText.Caption := ' ';
+    FTabControlText.Font.Style := [fsBold];
+  end;
+
 begin
   inherited;
   Kind := ekCode;
@@ -345,6 +357,7 @@ begin
   InitCodeTab;
   InitPreprocessTab;
   InitHistoryTab;
+  InitTabControlText;
   SetColorSpeedSetting(gSettings.CodeEditorStyle);
   FCodeTab.Click;
   OnResize := WhenResizing;
@@ -643,6 +656,11 @@ procedure Tmp3CodeEditorFrame.SetReadOnly(const Value: Boolean);
 begin
   inherited;
   FSynEdit.ReadOnly := Value;
+end;
+
+procedure Tmp3CodeEditorFrame.SetTabControlText(const AValue: widestring);
+begin
+  FTabControlText.Caption := AValue;
 end;
 
 function Tmp3CodeEditorFrame.GetWhatText: string;

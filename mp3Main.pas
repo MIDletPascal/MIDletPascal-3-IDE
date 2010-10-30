@@ -2171,15 +2171,15 @@ begin
 end;
 
 procedure Tmp3MainForm.RefreshStatusBarEditorInfo;
-var x, y: integer; s: string; ce: TsitEditorFrame;
+var x, y: integer; ce: TsitEditorFrame;
 begin
-  s := ' ';
   ce := FMainFrame.CurrentEditor;
-  if assigned(ce) and (ce.Kind = ekCode) then begin
-    Tmp3CodeEditorFrame(ce).GetCaretPosition(x, y);
-    s := IntToStr(y)+' : '+IntToStr(x);
-  end;
-  StatusBarRightText.Caption := s;
+  if assigned(ce) and (ce.Kind = ekCode) then
+    with Tmp3CodeEditorFrame(ce) do
+    begin
+      GetCaretPosition(x, y);
+      SetTabControlText(IntToStr(y)+' : '+IntToStr(x));
+    end;
 end;
 
 procedure Tmp3MainForm.RefreshTranslation;
