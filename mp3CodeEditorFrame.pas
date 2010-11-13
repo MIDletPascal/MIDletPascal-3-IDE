@@ -707,15 +707,19 @@ begin
   try
     ReplaceWhat := GetWhatText;
     ReplaceWith := '';
+    WholeWords := FSearchWholeWords;
     CaseSensitive := FSearchCaseSensitive;
     while ShowModal<>mrCancel do begin
-      FSynEdit.SearchEngine := FSearch;    
+      FSynEdit.SearchEngine := FSearch;
       FSearchCaseSensitive := CaseSensitive;
       FSearchText := ReplaceWhat;
       FReplaceText := ReplaceWith;
       FReplaceAll := ReplaceAll;
       FSearchWholeWords := WholeWords;
-      DoSearchReplaceText(false,true);
+      if FSynEdit.SelText <> '' then
+        DoSearchReplaceText(false,true);
+      FindNext;
+      FSynEdit.SetFocus;
     end;
   finally
     Free;
@@ -728,7 +732,9 @@ begin
   if AReplace then begin
     Options := [ssoPrompt, ssoReplace];
     if FReplaceAll then
-      Include(Options, ssoReplaceAll);
+      Include(Options, ssoReplaceAll)
+    else
+      Include(Options, ssoSelectedOnly);
     AReplaceText := FReplaceText;
   end else begin
     Options := [];
