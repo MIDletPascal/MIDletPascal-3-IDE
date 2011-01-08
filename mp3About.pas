@@ -91,11 +91,11 @@ begin
     '<br>'+
     '<b>MIDletPascal compiler</b> [license: GPL]<br>'+
     '</font><font name="Tahoma" color="#000000" size="8">'+
-    'Copyright (c) 2004-2006 Mobile Experts Group / 2009-2010 MIDletPascal project<br>'+
+    'Copyright (c) 2004-2006 Mobile Experts Group / 2009-2011 MIDletPascal project<br>'+
     '<br>'+
     '<b>1.0-2.0</b><br><i>original development</i><br>Niksa Orlic ( norlic )<br><br>'+
     '<b>3.0</b><br><i>enhancements</i><br>Artem ( abcdef )<br><br>'+
-    '<b>3.0-3.2</b><br><i>enhancements/maintenance</i><br>Javier Santo Domingo ( j-a-s-d )<br><br>'+
+    '<b>3.0-3.3</b><br><i>enhancements/maintenance</i><br>Javier Santo Domingo ( j-a-s-d )<br><br>'+
     '</font></p>';
 end;
 
@@ -106,7 +106,7 @@ begin
     '<p bgcolor="#FEEE8F" align="center"><font name="Tahoma" color="#000000" size="9">'+
     '<b>MIDletPascal 3.x IDE</b> [license: BSD]<br>'+
     '</font><font name="Tahoma" color="#000000" size="8">'+
-    'Copyright (c) 2010 Javier Santo Domingo ( j-a-s-d )<br>'+
+    'Copyright (c) 2010-2011 Javier Santo Domingo ( j-a-s-d )<br>'+
     '<br>'+
     '<br>'+
     'For more information about MP3IDE visit:'+
@@ -149,6 +149,7 @@ begin
     'Wes Williams ( wesw )<br><br>'+
     'K. W. Yan ( kwyan )<br><br>'+
     'Prof. Yaffle ( professoryaffle )<br><br>'+
+    'Cepreu H. ( cepreuh )<br><br>'+
     'and many others at the <a href="http://sourceforge.net/projects/midletpascal/forums/forum/1013750">project''s forum</a><br><br>'+
     '</font></p>';
 end;

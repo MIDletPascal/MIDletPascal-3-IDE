@@ -11,13 +11,13 @@ const
 // MP 3 ------------------------------------------------------------------------
   PROJECT_NAME = 'MIDletPascal';
   PROJECT_MAJOR_VERSION = '3';
-  PROJECT_MINOR_VERSION = '2';
-  PROJECT_LABEL_VERSION = '';
+  PROJECT_MINOR_VERSION = '3';
+  PROJECT_LABEL_VERSION = 'ALPHA';
   PROJECT_VERSION =
     PROJECT_MAJOR_VERSION+'.'+PROJECT_MINOR_VERSION+' '+PROJECT_LABEL_VERSION;
-  RELEASE_DATE_DAY = '13';
-  RELEASE_DATE_MONTH = '11';
-  RELEASE_DATE_YEAR = '2010';
+  RELEASE_DATE_DAY = '08';
+  RELEASE_DATE_MONTH = '01';
+  RELEASE_DATE_YEAR = '2011';
 
   PROJECT_SITE_URL =
     'http://sourceforge.net/projects/midletpascal/';

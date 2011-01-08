@@ -12,12 +12,13 @@ uses
   gnugettext,
   sitFileUtils, sitEditorsFrame, sitEditorFrame, sitFrame,
   sitMPHexEditorFrame, sitPNGImageEditorFrame,
-  mp3CodeEditorFrame,
+  mp3CodeEditorFrame, mp3WelcomePageFrame,
   mp3FileKind, mp3Consts, mp3Settings;
 
 type
   Tmp3MainFrame = class(TsitEditorsFrame)
   private
+    FWelcomePage: Tmp3WelcomePageFrame;
     FOnCodeEditorPreprocess: TNotifyEvent;
     FOnCodeEditorHistory: TNotifyEvent;
     FOnCodeEditorOpenFileAtCursor: TNotifyEvent;
@@ -33,6 +34,7 @@ type
     procedure OnCodeHistory(Sender: TObject);
     procedure OnCodePreprocess(Sender: TObject);
     function NewEditor(AKind: TsitEditorKind): TsitEditorFrame;
+    procedure InitWelcomePage;
   public
     procedure AfterConstruction; override;
     procedure BeforeDestruction; override;
@@ -58,6 +60,7 @@ type
       read FOnCodeEditorRollback write FOnCodeEditorRollback;
     property OnCodeEditorSendToBuffer: TNotifyEvent
       read FOnCodeEditorSendToBuffer write FOnCodeEditorSendToBuffer;
+    property WelcomePage: Tmp3WelcomePageFrame read FWelcomePage;
   end;
 
 implementation
@@ -73,6 +76,7 @@ procedure Tmp3MainFrame.AfterConstruction;
 begin
   inherited;
   lMainFrame := Self;
+  InitWelcomePage;
 end;
 
 procedure Tmp3MainFrame.BeforeDestruction;
@@ -230,6 +234,22 @@ var i: integer;
 begin
   for i := 0 to FFrames.Count - 1 do
     RetranslateComponent(FFrames[i]);
+end;
+
+procedure Tmp3MainFrame.InitWelcomePage;
+var s: string;
+begin
+  if not assigned(FWelcomePage) then begin
+    s := GetCurrentLanguage;
+    UseLanguage('en');
+    FWelcomePage := Tmp3WelcomePageFrame.Create(Self);
+    AddFrame(FWelcomePage);
+    FWelcomePage.SetTitle('Welcome');
+    TranslateComponent(FWelcomePage);
+    UseLanguage(s);
+    RetranslateComponent(FWelcomePage);
+  end;
+  FWelcomePage.Tab.Click;
 end;
 
 // GetCodeContent

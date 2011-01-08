@@ -378,7 +378,6 @@ begin
   Maximize;
   OnDropFile := OnDropFileHandler;
   SetTitleBarCaption;
-  RefreshSubmenus(true);
   // dialogs
   dlgFont.Options := dlgFont.Options + [fdNoStyleSel,fdNoSimulations] - [fdEffects];
   // main frame
@@ -399,6 +398,9 @@ begin
   FMainFrame.OnCodeEditorGetHelpOnWord := OnCodeEditorGetHelpOnWord;
   FMainFrame.OnCodeEditorRollback := OnCodeEditorRollback;
   FMainFrame.OnCodeEditorSendToBuffer := OnCodeEditorSendToBuffer;
+  // welcome page
+  FMainFrame.WelcomePage.Show;
+  RefreshSubmenus(true);
   // project manager
   FProjectManager := Tmp3ProjectManager.Create(Self);
   FProjectManager.Parent := FMainFrame.DockLeft;
@@ -1878,12 +1880,13 @@ begin
 end;
 
 procedure Tmp3MainForm.RefreshActions;
-var i: integer; eo, pl, gl: boolean; ce: TsitEditorFrame;
+var i: integer; eo, pl, gl, co: boolean; ce: TsitEditorFrame;
 begin
   eo := FMainFrame.HasEditorOpened;
   ce := FMainFrame.CurrentEditor;
   pl := FProjectManager.HasItemLoaded;
   gl := FGroupManager.HasItemLoaded;
+  co := eo and assigned(ce);
   actSaveFile.Enabled := eo;
   actCloseFile.Enabled := eo;
   actCloseAllFiles.Enabled := eo;
@@ -1893,9 +1896,9 @@ begin
   for i := 0 to al_actProject.ActionCount - 1 do
     TAction(al_actProject.Actions[i]).Enabled := pl;
   for i := 0 to al_actEdit.ActionCount - 1 do
-    TAction(al_actEdit.Actions[i]).Enabled := eo and(ce.Kind<>ekImage);
+    TAction(al_actEdit.Actions[i]).Enabled := co and (ce.Kind <> ekImage);
   for i := 0 to al_actSearch.ActionCount - 1 do
-    TAction(al_actSearch.Actions[i]).Enabled := eo and(ce.Kind=ekCode);
+    TAction(al_actSearch.Actions[i]).Enabled := co and (ce.Kind = ekCode);
   actStopBuildProcess.Enabled := FBuilding;
 end;
 
@@ -2070,6 +2073,8 @@ begin
   finally
     st.Free;
   end;
+  if assigned(FMainFrame) and assigned(FMainFrame.WelcomePage) then
+    FMainFrame.WelcomePage.Recents.LoadActionList(al_actReopen);
 end;
 
 procedure Tmp3MainForm.OnSetCodeEditorStyle(Sender: TObject);
