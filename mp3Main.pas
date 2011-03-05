@@ -172,6 +172,7 @@ type
     imgReadOnly: TImage;
     actOpenClassesFolder: TAction;
     actMinimizeToTray: TAction;
+    actWelcomePage: TAction;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -252,6 +253,7 @@ type
     procedure actSetDefaultProjectLocationExecute(Sender: TObject);
     procedure actOpenClassesFolderExecute(Sender: TObject);
     procedure actMinimizeToTrayExecute(Sender: TObject);
+    procedure actWelcomePageExecute(Sender: TObject);
   private
     FBuilding: boolean;
     FBuildingGroup: boolean;
@@ -398,8 +400,6 @@ begin
   FMainFrame.OnCodeEditorGetHelpOnWord := OnCodeEditorGetHelpOnWord;
   FMainFrame.OnCodeEditorRollback := OnCodeEditorRollback;
   FMainFrame.OnCodeEditorSendToBuffer := OnCodeEditorSendToBuffer;
-  // welcome page
-  FMainFrame.WelcomePage.Show;
   RefreshSubmenus(true);
   // project manager
   FProjectManager := Tmp3ProjectManager.Create(Self);
@@ -452,7 +452,7 @@ begin
   FCompilerMessagesPanel.OnClose := OnCompilerMessagesPanelClose;
   FCompilerMessagesPanel.OnDoubleClickLine := OnDoubleClickLine;
 {$IFDEF WOW64_WORKAROUND}
-  if IsUnderWow64 then
+  if CompilerPresent and (IsUnderWow64 or (RetrieveCompilerVersion = '')) then
     mp3ProjectBuilding.CompilerMessageHandlerHandle := Self.Handle;
 {$ENDIF}
   mp3ProjectBuilding.CompilerMessageHandler := ShowCompilerMessage;
@@ -1388,6 +1388,19 @@ begin
   ShellExecute(0,'open',PROJECT_SITE_URL,'','',1);
 end;
 
+procedure Tmp3MainForm.actWelcomePageExecute(Sender: TObject);
+begin
+  actWelcomePage.Checked := not actWelcomePage.Checked;
+  if actWelcomePage.Checked then begin
+    FMainFrame.WelcomePage.Show;
+    FMainFrame.WelcomePage.Tab.Visible := true;
+  end else begin
+    FMainFrame.WelcomePage.Tab.Visible := false;
+    FMainFrame.WelcomePage.Hide;
+    actNextTab.Execute;
+  end;
+end;
+
 procedure Tmp3MainForm.actRedoExecute(Sender: TObject);
 begin
   if assigned(FMainFrame.CurrentEditor) then
@@ -2236,17 +2249,20 @@ begin
     FGroupManager.Parent := FMainFrame.DockRight;
   FMainFrame.DockLeft.Width := gSettings.LeftDockWidth;
   FMainFrame.DockRight.Width := gSettings.RightDockWidth;
+  if gSettings.WelcomePage <> actWelcomePage.Checked then
+    actWelcomePage.Execute;
   if gSettings.GroupManager <> actGroupManager.Checked then
-      actGroupManager.Execute;
+    actGroupManager.Execute;
   if gSettings.ProjectManager <> actProjectManager.Checked then
-      actProjectManager.Execute;
+    actProjectManager.Execute;
   if gSettings.FullScreen <> actFullScreen.Checked then
-      actFullScreen.Execute;
+    actFullScreen.Execute;
 end;
 
 procedure Tmp3MainForm.WriteSettings;
 begin
   gSettings.CurrentSkin := TurboUIColorManager.Skin;
+  gSettings.WelcomePage := actWelcomePage.Checked;
   gSettings.GroupManager := actGroupManager.Checked;
   gSettings.ProjectManager := actProjectManager.Checked;
   gSettings.GroupManagerPosition := FGroupManager.Parent.Name;

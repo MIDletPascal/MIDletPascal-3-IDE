@@ -16,6 +16,17 @@ uses
   mp3Consts, mp3Settings;
 
 type
+  Tmp3CompilerVersionDetector = class(TsitCompilerInvoker)
+  private
+    class var FVersion: string;
+  protected
+    class procedure BeforeCompile; override;
+  public
+    class procedure ShowCompilerNewLine(Sender: TObject;
+      NewLine: string; IsNewLine: boolean);
+    class property Version: string read FVersion;
+  end;
+
   Tmp3CompilerInvoker = class(TsitCompilerInvoker)
   protected
     class procedure BeforeCompile; override;
@@ -42,6 +53,7 @@ function BuildSourceFile(AProject: Tmp3Project; ASourceFile: Tmp3SourceFile;
 function Build(AProject: Tmp3Project; var AError: string): boolean;
 procedure StopBuilding;
 function CompilerPresent: boolean;
+function RetrieveCompilerVersion: string;
 
 implementation
 
@@ -138,6 +150,37 @@ begin
       st.SaveToFile(ASrcDirectory+AProcessedFilename);
   finally
     st.Free;
+  end;
+end;
+
+{ Tmp3CompilerVersionDetector }
+
+class procedure Tmp3CompilerVersionDetector.BeforeCompile;
+begin
+  FVersion := '';
+  CompatibilityLayer := 'Win95';
+  NewLineHandler := ShowCompilerNewLine;
+end;
+
+class procedure Tmp3CompilerVersionDetector.ShowCompilerNewLine(Sender: TObject;
+  NewLine: string; IsNewLine: boolean);
+begin
+  if length(NewLine)<3 then
+    exit;
+  if IsNewLine and EndsText(#10,NewLine) then
+    NewLine := Copy(NewLine,1,Length(NewLine)-1);
+  if StartsStr('MIDletPascal',NewLine) then
+    FVersion := NewLine;
+  DefaultCompilerMessageHandler(pchar(NewLine));
+end;
+
+function RetrieveCompilerVersion: string;
+begin
+  with Tmp3CompilerVersionDetector do
+  try
+    Run('"'+gSettings.AppPath+COMPILER_EXE+'"');
+  finally
+    result := Version;
   end;
 end;
 

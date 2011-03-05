@@ -1,9 +1,9 @@
 [Setup]
 AppCopyright=Copyright by MIDletPascal project
-AppName=MIDletPascal 3.3 ALPHA
-AppVerName=MIDletPascal 3.3 ALPHA
-DefaultDirName={pf}\MIDletPascal 3.3 ALPHA
-DefaultGroupName=MIDletPascal 3.3 ALPHA
+AppName=MIDletPascal 3.3 BETA
+AppVerName=MIDletPascal 3.3 BETA
+DefaultDirName={pf}\MIDletPascal 3.3 BETA
+DefaultGroupName=MIDletPascal 3.3 BETA
 ShowLanguageDialog=yes
 AppID={{03CC75C8-4327-46F0-A248-C859D063DCE6}
 UninstallDisplayIcon={app}\mp3IDE.exe
@@ -47,12 +47,12 @@ Source: bin\Styles\*.ces; DestDir: {commondocs}\MIDletPascal\Styles\
 Source: bin\Skins\*.ini; DestDir: {commondocs}\MIDletPascal\Skins\; Flags: recursesubdirs createallsubdirs
 
 [Icons]
-Name: {group}\MIDletPascal 3.3 ALPHA; Filename: {app}\mp3IDE.exe; WorkingDir: {app}; IconFilename: {app}\mp3IDE.exe; IconIndex: 0
-Name: {group}\MIDletPascal 3.3 ALPHA Demos; Filename: {commondocs}\MIDletPascal\Demos\
-Name: {group}\MIDletPascal 3.3 ALPHA Help; Filename: {app}\Help\en\Index.htm
-Name: {group}\MIDletPascal 3.3 ALPHA Readme; Filename: {app}\README.txt
-Name: {group}\MIDletPascal 3.3 ALPHA History; Filename: {app}\HISTORY.txt
-Name: {group}\MIDletPascal 3.3 ALPHA License; Filename: {app}\LICENSE.txt
+Name: {group}\MIDletPascal 3.3 BETA; Filename: {app}\mp3IDE.exe; WorkingDir: {app}; IconFilename: {app}\mp3IDE.exe; IconIndex: 0
+Name: {group}\MIDletPascal 3.3 BETA Demos; Filename: {commondocs}\MIDletPascal\Demos\
+Name: {group}\MIDletPascal 3.3 BETA Help; Filename: {app}\Help\en\Index.htm
+Name: {group}\MIDletPascal 3.3 BETA Readme; Filename: {app}\README.txt
+Name: {group}\MIDletPascal 3.3 BETA History; Filename: {app}\HISTORY.txt
+Name: {group}\MIDletPascal 3.3 BETA License; Filename: {app}\LICENSE.txt
 
 [Registry]
 Root: HKCR; Subkey: ".mpsrc"; ValueType: "string"; ValueData: "MidletPascal.Source"

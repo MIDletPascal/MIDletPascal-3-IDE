@@ -315,6 +315,11 @@ object mp3MainForm: Tmp3MainForm
       Caption = '&Compiler Messages Panel'
       OnExecute = actCompilerMessagesPanelExecute
     end
+    object actWelcomePage: TAction
+      Caption = '&Welcome Page'
+      Checked = True
+      OnExecute = actWelcomePageExecute
+    end
     object VisibilitySeparrator: TAction
       Caption = '-'
     end

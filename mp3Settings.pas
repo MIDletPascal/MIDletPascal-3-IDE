@@ -27,6 +27,7 @@ type
     FCurrentSkin: string;
     FLibrariesDirectory: string;
     FStubsDirectory: string;
+    FWelcomePage: boolean;
     FGroupManager: boolean;
     FProjectManager: boolean;
     FGroupManagerPosition: string;
@@ -67,6 +68,7 @@ type
     property CodeEditorStyle: string read FCodeEditorStyle write FCodeEditorStyle;
     property CodeEditorFontName: string read FCodeEditorFontName write FCodeEditorFontName;
     property CodeEditorFontSize: integer read FCodeEditorFontSize write FCodeEditorFontSize;
+    property WelcomePage: boolean read FWelcomePage write FWelcomePage;
     property GroupManager: boolean read FGroupManager write FGroupManager;
     property ProjectManager: boolean read FProjectManager write FProjectManager;
     property GroupManagerPosition: string read FGroupManagerPosition write FGroupManagerPosition;
@@ -167,6 +169,8 @@ end;
 procedure Tmp3Settings.Load;
 begin
   FCurrentSkin := FIniFile.ReadString(CONFIG_IDE_SECTION,CONFIG_IDE_SECTION_SKIN,DEFAULT_SKIN);
+  FWelcomePage := StrToBool(FIniFile.ReadString(CONFIG_IDE_SECTION,
+    CONFIG_IDE_SECTION_WELCOMEPAGE,CONFIG_IDE_SECTION_WELCOMEPAGE_DEFAULT));
   FGroupManager := StrToBool(FIniFile.ReadString(CONFIG_IDE_SECTION,
     CONFIG_IDE_SECTION_GROUPMANAGER,CONFIG_IDE_SECTION_GROUPMANAGER_DEFAULT));
   FProjectManager := StrToBool(FIniFile.ReadString(CONFIG_IDE_SECTION,
@@ -212,6 +216,8 @@ procedure Tmp3Settings.Save;
 begin
   FIniFile.WriteString(CONFIG_IDE_SECTION,
     CONFIG_IDE_SECTION_SKIN,FCurrentSkin);
+  FIniFile.WriteString(CONFIG_IDE_SECTION,
+    CONFIG_IDE_SECTION_WELCOMEPAGE,BoolToStr(FWelcomePage));
   FIniFile.WriteString(CONFIG_IDE_SECTION,
     CONFIG_IDE_SECTION_GROUPMANAGER,BoolToStr(FGroupManager));
   FIniFile.WriteString(CONFIG_IDE_SECTION,
