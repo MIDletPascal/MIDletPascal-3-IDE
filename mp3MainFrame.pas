@@ -244,7 +244,7 @@ begin
     UseLanguage('en');
     FWelcomePage := Tmp3WelcomePageFrame.Create(Self);
     AddFrame(FWelcomePage);
-    FWelcomePage.SetTitle('Welcome');
+    FWelcomePage.SetTitle(_('Welcome'));
     TranslateComponent(FWelcomePage);
     UseLanguage(s);
     RetranslateComponent(FWelcomePage);

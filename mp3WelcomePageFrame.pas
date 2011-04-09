@@ -15,7 +15,6 @@ type
   strict private
     const SECTIONS_SEPARATION_MARGIN: integer = 32;
   private
-    FBackgroundPanel: TtuiPanel;
     FHeaderImage: TImage;
     FRecentProjectsSection: Tmp3WelcomePageSection;
   public
@@ -50,7 +49,7 @@ type
     procedure RefreshPanelHeight;
     function GetNodeAction(const ANodeIndex: Integer): TAction;
   public
-    constructor Create(AOwner: Tmp3WelcomePageFrame; AParent: TWinControl);
+    constructor Create(AOwner: Tmp3WelcomePageFrame);
     destructor Destroy; override;
     procedure LoadActionList(AActionList: TActionList);
     procedure SetSubTitle(ASubTitle: widestring);
@@ -73,9 +72,8 @@ uses
 procedure Tmp3WelcomePageFrame.AfterConstruction;
 begin
   inherited;
-  FBackgroundPanel := NewControlFactory(Self, Self).NewPanel.SetBorders(false)
-    .SetColor(clWhite).SetAlign(alClient).GetInstance;
-  FRecentProjectsSection := Tmp3WelcomePageSection.Create(Self, FBackgroundPanel);
+  Color := clWhite;
+  FRecentProjectsSection := Tmp3WelcomePageSection.Create(Self);
   FRecentProjectsSection.Top := SECTIONS_SEPARATION_MARGIN;
   FRecentProjectsSection.SetSubtitle('Recent Projects');
   FRecentProjectsSection.SetMaxItems(MRUINI_MAX);
@@ -97,7 +95,7 @@ procedure Tmp3WelcomePageFrame.SetHeader(AImage: TImage);
 begin
   if not assigned(FHeaderImage) then begin
     FHeaderImage := TImage.Create(Self);
-    FHeaderImage.Parent := FBackgroundPanel;
+    FHeaderImage.Parent := Self;
     FHeaderImage.AutoSize := true;
     FHeaderImage.Left := SECTIONS_SEPARATION_MARGIN - 16;
     FHeaderImage.Top := SECTIONS_SEPARATION_MARGIN - 12;
@@ -108,18 +106,18 @@ end;
 
 { Tmp3WelcomePageSection }
 
-constructor Tmp3WelcomePageSection.Create(AOwner: Tmp3WelcomePageFrame; AParent: TWinControl);
+constructor Tmp3WelcomePageSection.Create(AOwner: Tmp3WelcomePageFrame);
 begin
   inherited Create;
   FItemsChildCount := 1;
   FMaxItems := 9;
   FChangingSelection := false;
-  with NewControlFactory(AOwner, AParent) do
+  with AOwner.ControlFactory do
   begin
     FLabel := NewLabel.SetLeft(32).SetCaption('').SetFontSize(18).GetInstance;
     FPanel := NewPanel.SetLeft(32).SetColor($FAFAFA).SetBorders(false)
       .SetAnchors([akRight, akLeft, akTop]).GetInstance;
-    FPanel.ClientWidth := AParent.ClientWidth - 64;
+    FPanel.ClientWidth := AOwner.ClientWidth - 64;
   end;
   FVst := TVirtualStringTree.Create(AOwner);
   FVst.Parent := FPanel;

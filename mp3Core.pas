@@ -41,7 +41,7 @@ uses
 constructor Tmp3Core.Create;
 begin
   if assigned(gCore) then
-    raise Exception.Create('It already has a Core!');
+    FreeAndNil(gCore);
   gCore := Self;
   inherited;
   Application.Title := PROJECT_NAME;
