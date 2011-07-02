@@ -24,6 +24,7 @@ type
     FLoaded: boolean;
     FProjectDirectory: string;
     FClassesDirectory: string;
+    FLibrariesDirectory: string;
     FOutputDirectory: string;
     FSourceDirectory: string;
     FResourceDirectory: string;
@@ -64,6 +65,7 @@ type
     property MaxBackups: integer read FMaxBackUps write FMaxBackUps;
     property ProjectDirectory: string read FProjectDirectory;
     property ClassesDirectory: string read FClassesDirectory;
+    property LibrariesDirectory: string read FLibrariesDirectory;
     property OutputDirectory: string read FOutputDirectory;
     property SourceDirectory: string read FSourceDirectory;
     property ResourceDirectory: string read FResourceDirectory;
@@ -264,6 +266,7 @@ begin
   FJavaArchiveFilename := FOutputDirectory +
     ChangeFileExt(ExtractFileName(AFilename),EXTENSION_JAR);
   FClassesDirectory := FProjectDirectory + DIR_CLASSES + '\';
+  FLibrariesDirectory := FProjectDirectory + DIR_LIBS + '\';
   FResourceDirectory := FProjectDirectory + DIR_RESOURCES + '\';
   FSourceDirectory := FProjectDirectory + DIR_SOURCES + '\';
   FHistoryDirectory := FProjectDirectory + DIR_HISTORY + '\';
@@ -293,6 +296,7 @@ begin
   FJavaDescriptorFilename := '';
   FJavaArchiveFilename := '';
   FClassesDirectory := '';
+  FLibrariesDirectory := '';
   FResourceDirectory := '';
   FSourceDirectory := '';
   FHistoryDirectory := '';
@@ -306,7 +310,8 @@ end;
 function Tmp3Project.Load(AFilename: string): boolean;
 begin
   Init(AFilename);
-  FLoaded := FileExists(FFilename) and (ReadProject(Self) or ImportMP1Project(Self));
+  FLoaded := FileExists(FFilename)
+    and (ReadProject(Self) or ImportMP1Project(Self)) and EnsureDirectories;
   result := FLoaded;
 end;
 
@@ -317,6 +322,8 @@ begin
       ForceDirectories(FOutputDirectory);
     if not DirectoryExists(FClassesDirectory) then
       ForceDirectories(FClassesDirectory);
+    if not DirectoryExists(FLibrariesDirectory) then
+      ForceDirectories(FLibrariesDirectory);
     if not DirectoryExists(FResourceDirectory) then
       ForceDirectories(FResourceDirectory);
     if not DirectoryExists(FSourceDirectory) then
@@ -327,6 +334,7 @@ begin
       ForceDirectories(FScriptsDirectory);
     result := DirectoryExists(FOutputDirectory) and
       DirectoryExists(FClassesDirectory) and
+      DirectoryExists(FLibrariesDirectory) and
       DirectoryExists(FResourceDirectory) and
       DirectoryExists(FHistoryDirectory) and
       DirectoryExists(FScriptsDirectory) and

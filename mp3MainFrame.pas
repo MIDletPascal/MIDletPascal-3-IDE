@@ -67,6 +67,9 @@ implementation
 
 {$R *.dfm}
 
+uses
+  sitSynCodeEditorStylesPas;
+
 var
   lMainFrame: Tmp3MainFrame;
 
@@ -77,6 +80,7 @@ begin
   inherited;
   lMainFrame := Self;
   InitWelcomePage;
+  gSynCodeEditorStylesPasDialogApplyHandler := RefreshCodeEditorStyle;
 end;
 
 procedure Tmp3MainFrame.BeforeDestruction;

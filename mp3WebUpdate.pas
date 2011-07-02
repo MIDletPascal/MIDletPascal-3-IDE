@@ -9,7 +9,7 @@ interface
 
 uses
   Windows, SysUtils, Forms, Dialogs, StrUtils,
-  sitInetUtils, sitSFWebUpdate,
+  sitInetUtils, sitSFWebUpdate, sitWebUpdate,
   mp3Settings, mp3Consts;
 
 type
@@ -17,10 +17,10 @@ type
   strict private
     function IsNewerByDate(ADateStr: string): boolean;
   strict protected
-    function IsUpgradeDownload(ADownload: TsitSFDownload): boolean; override;
+    function IsUpgradeDownload(ADownload: TsitDownload): boolean; override;
   public
     constructor Create;
-    function DownloadUpdate(ADownload: TsitSFDownload): boolean;
+    function DownloadUpdate(ADownload: TsitDownload): boolean;
     function LaunchDownloadedUpdate: boolean;
   end;
 
@@ -50,7 +50,7 @@ begin
     result := false;
 end;
 
-function Tmp3WebUpdate.IsUpgradeDownload(ADownload: TsitSFDownload): boolean;
+function Tmp3WebUpdate.IsUpgradeDownload(ADownload: TsitDownload): boolean;
 begin
   result := inherited IsUpgradeDownload(ADownload)
     and StartsText('/'+PROJECT_MAJOR_VERSION+'.',ADownload.Title)
@@ -63,7 +63,7 @@ begin
   result := LaunchInstallationPendingUpdate('/UPDATE');
 end;
 
-function Tmp3WebUpdate.DownloadUpdate(ADownload: TsitSFDownload): boolean;
+function Tmp3WebUpdate.DownloadUpdate(ADownload: TsitDownload): boolean;
 var s: string;
 begin
   result := false;

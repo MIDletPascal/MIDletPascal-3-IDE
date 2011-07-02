@@ -11,12 +11,12 @@ const
 // MP 3 ------------------------------------------------------------------------
   PROJECT_NAME = 'MIDletPascal';
   PROJECT_MAJOR_VERSION = '3';
-  PROJECT_MINOR_VERSION = '3';
-  PROJECT_LABEL_VERSION = '';
+  PROJECT_MINOR_VERSION = '4';
+  PROJECT_LABEL_VERSION = 'ALPHA';
   PROJECT_VERSION =
     PROJECT_MAJOR_VERSION+'.'+PROJECT_MINOR_VERSION+' '+PROJECT_LABEL_VERSION;
-  RELEASE_DATE_DAY = '21';
-  RELEASE_DATE_MONTH = '05';
+  RELEASE_DATE_DAY = '02';
+  RELEASE_DATE_MONTH = '07';
   RELEASE_DATE_YEAR = '2011';
 
   PROJECT_SITE_URL =
@@ -25,6 +25,7 @@ const
     'http://downloads.sourceforge.net/project/midletpascal';
   PROJECT_ALL_DOWNLOADS_RSS_URL =
     'http://sourceforge.net/api/file/index/project-id/279759/mtime/desc/rss';
+  WEBUPDATE_MESSAGE_DELAY = 1500;
 
   RECENTS_FILENAME = 'recents.ini';
 
@@ -33,6 +34,7 @@ const
   LIBS_DIR = 'Libs';
   HELP_DIR = 'Help';
   HELP_FILE = HELP_DIR+'\%s\index.htm';
+  SKINS_DIR = 'Skins';
 
   BUILD_SWITCH = '-build';
 
@@ -66,6 +68,10 @@ const
 
   EMULATORS_MAX = 16;
 
+  SIDEBAR_LEFT = 'Left';
+  SIDEBAR_RIGHT = 'Right';
+  SIDEBAR_HIDDEN = 'Hidden';
+
   CONFIG_TRUE = '-1';
   CONFIG_FALSE = '0';
   CONFIG_LEFTDOCK = 'LeftDock';
@@ -76,6 +82,8 @@ const
   CONFIG_IDE_SECTION_SKIN = 'Skin';
   CONFIG_IDE_SECTION_WELCOMEPAGE = 'WelcomePage';
   CONFIG_IDE_SECTION_WELCOMEPAGE_DEFAULT = CONFIG_TRUE;
+  CONFIG_IDE_SECTION_SIDEBAR = 'SideBar';
+  CONFIG_IDE_SECTION_SIDEBAR_DEFAULT = SIDEBAR_RIGHT;
   CONFIG_IDE_SECTION_GROUPMANAGER = 'GroupManager';
   CONFIG_IDE_SECTION_GROUPMANAGER_DEFAULT = CONFIG_TRUE;
   CONFIG_IDE_SECTION_PROJECTMANAGER = 'ProjectManager';
@@ -135,6 +143,7 @@ const
   DEFINE_MP31 = 'MIDLETPASCAL31';
   DEFINE_MP32 = 'MIDLETPASCAL32';
   DEFINE_MP33 = 'MIDLETPASCAL33';
+  DEFINE_MP34 = 'MIDLETPASCAL34';
 
   MPDEFINES =
     DEFINE_J2ME + COMMA +
@@ -142,7 +151,8 @@ const
     DEFINE_MP30 + COMMA +
     DEFINE_MP31 + COMMA +
     DEFINE_MP32 + COMMA +
-    DEFINE_MP33;
+    DEFINE_MP33 + COMMA +
+    DEFINE_MP34;
 
   XML_ENCODING_TAG = '<?xml version="1.0" encoding="UTF-8" ?>';
 
@@ -350,6 +360,7 @@ const
 // Project Directories
   DIR_OUTPUT = 'bin';
   DIR_CLASSES = 'classes';
+  DIR_LIBS = 'libs';
   DIR_RESOURCES = 'res';
   DIR_SOURCES = 'src';
 

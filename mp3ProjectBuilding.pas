@@ -220,14 +220,15 @@ begin
   DefaultCompilerMessageHandler(pchar(NewLine));
 end;
 
-function InvokeCompiler(ASourceFile, AOutputDirectory, ALibDirectory: string;
+function InvokeCompiler(ASourceFile, AOutputDirectory, AGlobalLibDirectory, AProjectLibDirectory: string;
     ACanvasType, AMathType: integer; ADetectUnitsOnly: boolean): DWORD;
 var cmd: string;
 begin
   cmd := '"'+gSettings.AppPath+COMPILER_EXE+'"'+
     ' -s"'+ASourceFile+'"'+
     ' -o"'+ExcludeTrailingPathDelimiter(AOutputDirectory)+'"'+
-    ' -l"'+ExcludeTrailingPathDelimiter(ALibDirectory) +'"'+
+    ' -l"'+ExcludeTrailingPathDelimiter(AGlobalLibDirectory) +'"'+
+    ' -p"'+ExcludeTrailingPathDelimiter(AProjectLibDirectory) +'"'+
     ' -c'+IntToStr(ACanvasType)+
     ' -m'+IntToStr(AMathType)+
     ' -r'+IntToStr(next_record_ID)
@@ -258,7 +259,7 @@ begin
     ftc := ASourceFilename;
   try
     result := InvokeCompiler(
-      ftc, AProject.ClassesDirectory, gSettings.LibrariesDirectory,
+      ftc, AProject.ClassesDirectory, gSettings.LibrariesDirectory, AProject.LibrariesDirectory,
       DWORD(AProject.BuildConfigurations[
         AProject.BuildConfigurations.ActiveConfigurationIndex].MIDletType),
       StrToInt(RealNumbersToMP2ProjectValue(AProject.BuildConfigurations[
@@ -291,7 +292,7 @@ begin
   while (not result)and(a<COMPILER_INTERNAL_ERROR_RETRIES) do
   try
     result := InvokeCompiler(
-      ftc, AProject.ClassesDirectory, gSettings.LibrariesDirectory,
+      ftc, AProject.ClassesDirectory, gSettings.LibrariesDirectory, AProject.LibrariesDirectory,
       DWORD(AProject.BuildConfigurations[
         AProject.BuildConfigurations.ActiveConfigurationIndex].MIDletType),
       StrToInt(RealNumbersToMP2ProjectValue(AProject.BuildConfigurations[
@@ -520,20 +521,27 @@ var ftcFiles, jarFiles: TStringList; mContent, jarSize, buildDir: string;
   end;
 
   function IncludeLibs: boolean;
-  var libsDir: string; x: integer;
+  var x: integer;
 
     function AddLib(ALibFilename: string): boolean;
+    var libsDir: string;
     begin
-      result := FileExists(libsDir+ALibFilename);
+      result := false;
+      if FileExists(AProject.LibrariesDirectory+ALibFilename) then begin
+        libsDir := AProject.LibrariesDirectory;
+        result := true;
+      end else if FileExists(gSettings.LibrariesDirectory+ALibFilename) then begin
+        libsDir := gSettings.LibrariesDirectory;
+        result := true;
+      end;
       if result then
         jarFiles.Add(ALibFilename + '=' + libsDir+ALibFilename)
       else
-        AError := 'ERROR: could not find lib '+ALibFilename;
+        AError := 'ERROR: could not find library '+ALibFilename;
     end;
 
   begin
     result := true;
-    libsDir := gSettings.LibrariesDirectory;
     for x := 0 to libs.Count - 1 do begin
       result := AddLib(EXTERNAL_LIBRARY_PREFIX+libs[x]+EXTENSION_CLASS);
       if not result then
@@ -596,6 +604,10 @@ var ftcFiles, jarFiles: TStringList; mContent, jarSize, buildDir: string;
       begin
         DefaultCompilerProgressHandler((x+1)*100 div jarFiles.Count);
         DefaultCompilerMessageHandler(pchar('  adding '+jarFiles.Names[x]));
+        if not FileExists(jarFiles.ValueFromIndex[x]) then begin
+          AError := 'ERROR: File not found.';
+          exit;
+        end;
         zipper.AddFiles(jarFiles.ValueFromIndex[x],0);
         if stop then begin
           result := false;

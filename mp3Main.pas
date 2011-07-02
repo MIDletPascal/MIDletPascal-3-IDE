@@ -11,16 +11,12 @@ uses
   Windows, Messages, Dialogs, Controls, ActnList,
   Classes, ImgList, Menus, ExtCtrls, Forms, Graphics,
   DosCommand,
-  OtlTask, OtlTaskControl, OtlEventMonitor, OtlComm,
-  sitGenericMainForm, sitCompilerMessagesPanel,
+  tuiSideBar,
+  sitBaseMainForm, sitCompilerMessagesPanel, sitBackgroundCompilation,
   mp3ProjectManager, mp3GroupManager, mp3MainFrame;
 
-const
-  WM_PERFORMBUILD = WM_USER + $0888;
-  MESSAGE_DELAY = 1500;
-
 type
-  Tmp3MainForm = class(TsitGenericMainForm)
+  Tmp3MainForm = class(TsitBaseMainForm)
     alMainMenu: TActionList;
     actFile: TAction;
     actEdit: TAction;
@@ -173,6 +169,21 @@ type
     actOpenClassesFolder: TAction;
     actMinimizeToTray: TAction;
     actWelcomePage: TAction;
+    actOpenLibsFolder: TAction;
+    imError: TImage;
+    imWarning: TImage;
+    imInformation: TImage;
+    imConfirmation: TImage;
+    ilProjectBig: TImageList;
+    ilFileBig: TImageList;
+    actSideBar: TAction;
+    actSetEnvironmentVariables: TAction;
+    NewSeparator: TAction;
+    al_actSideBar: TActionList;
+    actSideBarRight: TAction;
+    actSideBarLeft: TAction;
+    actSideBarHidden: TAction;
+    actSideBarSeparator: TAction;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -254,7 +265,13 @@ type
     procedure actOpenClassesFolderExecute(Sender: TObject);
     procedure actMinimizeToTrayExecute(Sender: TObject);
     procedure actWelcomePageExecute(Sender: TObject);
+    procedure actOpenLibsFolderExecute(Sender: TObject);
+    procedure actSetEnvironmentVariablesExecute(Sender: TObject);
+    procedure actSideBarLeftExecute(Sender: TObject);
+    procedure actSideBarRightExecute(Sender: TObject);
+    procedure actSideBarHiddenExecute(Sender: TObject);
   private
+    FInCommandLineBuild: boolean;
     FBuilding: boolean;
     FBuildingGroup: boolean;
     FBuildNextInGroup: boolean;
@@ -264,13 +281,16 @@ type
     FMainFrame: Tmp3MainFrame;
     FGroupManager: Tmp3GroupManager;
     FProjectManager: Tmp3ProjectManager;
+    FSideBar: TtuiSideBar;
     FCompilerMessagesPanel: TsitCompilerMessagesPanel;
+    FBackgroundCompilation: TsitBackgroundCompilation;
     FCompilerError: string;
-    FCompilerTask: IOmniTask;
-    FMessageDispatch: TOmniEventMonitor;
     FReferenceTopics: TStringList;
     FAvailableTranslations: TStringList;
     FLastDownloadProgressMessageTickCount: DWORD;
+    procedure OnActionHintHandler(var HintStr: string; var CanShow: Boolean);
+    procedure OnStartBuilding(Sender: TObject);
+    procedure OnStopBuilding(Sender: TObject);
     procedure OnManageCodeEditorStylesExecute(Sender: TObject);
     procedure OnManageEmulatorsExecute(Sender: TObject);
     procedure OnSetDefaultEmulatorExecute(Sender: TObject);
@@ -304,12 +324,7 @@ type
     procedure RefreshSubmenus(AAvoidRetranslation: boolean = false);
     procedure RefreshTranslation;
     procedure SendToRecents(AFilename: string);
-    function PrepareCompilerMessagesPanel: boolean;
-    procedure BackgroundBuild(const task: IOmniTask);
-    procedure ShowCompilerMessage(AMessage: string);
-    procedure ShowCompilerProgress(AValue: DWORD);
-    procedure HandleTaskTerminated(const task: IOmniTaskControl);
-    procedure HandleTaskMessage(const task: IOmniTaskControl; const msg: TOmniMessage);
+    procedure PrepareCompilerMessagesPanel;
     procedure LoadGroup(AFilename: string);
     procedure LoadProject(AFilename: string);
     procedure LoadInCodeEditor(AFilename: string);
@@ -320,25 +335,24 @@ type
     procedure FillReferenceTopics;
     procedure SetLanguage(ALanguageCode: string);
     function GetReferenceTopic(ATopic: string): integer;
-    procedure InternalPerformBuild(var Msg: TMessage); message WM_PERFORMBUILD;
     procedure OnRunningEmulatorFinish(Sender: TObject; ExitCode: LongWord);
     procedure OnLanguageClick(Sender: TObject);
 {$IFDEF WOW64_WORKAROUND}
     procedure CompilerMessageHandle(var Msg: TMessage); message WM_COPYDATA;
 {$ENDIF}
     procedure OnDowloadProgress(ADownloadedBytes: integer);
-    procedure UpdateStatusBarText(AText: widestring = ' ');
+    procedure UpdateStatusBarText(const AText: widestring = ' ');
     procedure OnInstallUpdateClick(Sender: TObject);
     procedure OnDropFileHandler(const AFilename: string);
     procedure OnSkinExecute(Sender: TObject);
     procedure RefreshSkins;
     procedure RefreshStatusBarEditorInfo;
   public
-    procedure Load(AFilename: string);
-    procedure PerformBuild;
+    procedure Load(const AFilename: string);
+    procedure CommandLineBuild(const AFilename: string);
     procedure ReadSettings;
     procedure WriteSettings;
-    procedure SetTitleBarCaption(ACaption: string = '');
+    procedure SetTitleBarCaption(const ACaption: string = '');
   end;
 
 implementation
@@ -350,7 +364,7 @@ uses
   tuiItemWithLocationDialog, tuiItemWithSizeDialog, tuiControls,
   tuiColorManager, tuiActionsUtils, tuiDialogs,
   sitOSUtils, sitDirUtils, sitConsts, sitDelforObjectPascalFormatter,
-  sitEditorFrame, sitInformationBar,
+  sitEditorFrame, sitInformationBar, sitEnvironmentVariablesDialog,
   mp3Consts, mp3About, mp3ProjectBuilding, mp3Core,
   mp3Group, mp3Project, mp3SourceFiles, mp3ResourceFiles,
   mp3EmulatorsDialog, mp3CodeEditorStylesDialog,
@@ -363,7 +377,13 @@ var i: integer; ti: TtuiMenuItem; si: TtuiSeparatorMenuItem;
 begin
   inherited;
   KeyPreview := true;
-  TtuiColorManager.AddSkinsFromFolder(gSettings.ConfigPath+'Skins');
+  FInCommandLineBuild := false;
+  // visuals related
+  TtuiColorManager.AddSkinsFromFolder(gSettings.ConfigPath + SKINS_DIR);
+  SpTBXMessageDlg.SetErrorPicture(imError.Picture);
+  SpTBXMessageDlg.SetWarningPicture(imWarning.Picture);
+  SpTBXMessageDlg.SetInformationPicture(imInformation.Picture);
+  SpTBXMessageDlg.SetConfirmPicture(imConfirmation.Picture);
   sitInformationBar.SetReadOnlyPicture(imgReadOnly.Picture);
   // web update related
   gCore.WebUpdate.OnDownloadProgress := OnDowloadProgress;
@@ -373,6 +393,11 @@ begin
   FAvailableTranslations := TStringList.Create;
   RefreshAvailableTranslations;
   RefreshLanguageActions;
+  actNew.OnHint := OnActionHintHandler;
+  actOpen.OnHint := OnActionHintHandler;
+  actBuild.OnHint := OnActionHintHandler;
+  actRun.OnHint := OnActionHintHandler;
+  actBuildAndRun.OnHint := OnActionHintHandler;
   // help topics
   FReferenceTopics := TStringList.Create;
   FillReferenceTopics;
@@ -444,9 +469,6 @@ begin
     end;
   FGroupManager.ProjectsActions := alGMProjects;
   // compiler messages
-  FMessageDispatch := TOmniEventMonitor.Create(Self);
-  FMessageDispatch.OnTaskMessage := HandleTaskMessage;
-  FMessageDispatch.OnTaskTerminated := HandleTaskTerminated;
   FCompilerMessagesPanel := TsitCompilerMessagesPanel.Create(Self);
   FCompilerMessagesPanel.Parent := FMainFrame.DockBottom;
   FCompilerMessagesPanel.OnClose := OnCompilerMessagesPanelClose;
@@ -455,8 +477,6 @@ begin
   if CompilerPresent and (IsUnderWow64 or (RetrieveCompilerVersion = '')) then
     mp3ProjectBuilding.CompilerMessageHandlerHandle := Self.Handle;
 {$ENDIF}
-  mp3ProjectBuilding.CompilerMessageHandler := ShowCompilerMessage;
-  mp3ProjectBuilding.CompilerProgressHandler := ShowCompilerProgress;
   for i := 0 to pmCompilerMessagesPanel.Items.Count - 1 do
     if pmCompilerMessagesPanel.Items[i].Caption = '-' then
       FCompilerMessagesPanel.PopupMenu.Items.Add(TtuiSeparatorMenuItem.Create(FCompilerMessagesPanel.PopupMenu))
@@ -465,6 +485,52 @@ begin
       ti.Action := pmCompilerMessagesPanel.Items[i].Action;
       FCompilerMessagesPanel.PopupMenu.Items.Add(ti);
     end;
+  // background compilation
+  FBackgroundCompilation := TsitBackgroundCompilation.Create;
+  FBackgroundCompilation.OnStartBuilding := OnStartBuilding;
+  FBackgroundCompilation.OnStopBuilding := OnStopBuilding;
+  FBackgroundCompilation.CompilerMessagesPanel := FCompilerMessagesPanel;
+  mp3ProjectBuilding.CompilerMessageHandler := FBackgroundCompilation.OnCompilerMessage;
+  mp3ProjectBuilding.CompilerProgressHandler := FBackgroundCompilation.OnCompilerProgress;
+  // side bar
+  FSideBar := TtuiSideBar.Create(Self);
+  FSideBar.Parent := TitleBar;
+  FSideBar.Constraints.MinWidth := FSideBar.ClientWidth;
+  FSideBar.Align := alRight;
+  FSideBar.Borders := false;
+  FSideBar.BottomPanel.ButtonsImageList := ilProjectBig;
+  with FSideBar.BottomPanel.NewButton(actBuildAndRun) do begin
+    ImageIdx := 2;
+    Hint := actBuildAndRun.Caption;
+  end;
+  with FSideBar.BottomPanel.NewButton(actRun) do begin
+    ImageIdx := 1;
+    Hint := actRun.Caption;
+  end;
+  with FSideBar.BottomPanel.NewButton(actBuild) do begin
+    ImageIdx := 0;
+    Hint := actBuild.Caption;
+  end;
+  FSideBar.TopPanel.Color := clGray - $00232323;
+  FSideBar.TopPanel.ButtonsImageList := ilFileBig;
+  with FSideBar.TopPanel.NewDropDownButton(actNew, TtuiPopupMenu.Create(Self)) do begin
+    ImageIdx := 0;
+    Hint := actNew.Caption;
+    for i := 0 to al_actNew.ActionCount - 1 do
+      if TAction(al_actNew.Actions[i]).Caption = '-' then
+        TtuiPopupMenu(DropDownMenu).Items.Add(TtuiSeparatorMenuItem.Create(DropDownMenu))
+      else begin
+        ti := TtuiMenuItem.Create(DropDownMenu);
+        //ti.Images := ilNewBig;
+        ti.FontSettings.Size := 200;
+        ti.Action := al_actNew.Actions[i];
+        TtuiPopupMenu(DropDownMenu).Items.Add(ti);
+      end;
+  end;
+  with FSideBar.TopPanel.NewButton(actOpen) do begin
+    ImageIdx := 1;
+    Hint := actOpen.Caption;
+  end;
   // add up controls for translation
   TranslateComponent(FCompilerMessagesPanel);
   TranslateComponent(FGroupManager);
@@ -493,6 +559,8 @@ begin
   FreeAndNil(FAvailableTranslations);
   if FBuilding then
     actStopBuildProcess.Execute;
+  if not FInCommandLineBuild then
+    FreeAndNil(FBackgroundCompilation);
 end;
 
 procedure Tmp3MainForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -520,12 +588,13 @@ begin
   if not DirectoryExists(path) then
     path := gSettings.AppPath+'Help\en\reference\';
   x := FindFirst(path + '*', 0, SR);
-  if x = 0 then repeat
-    FReferenceTopics.Add(
-      StringReplace(ChangeFileExt(SR.Name,''),'mr_','',[])+'='+path+SR.Name
-    );
-    x := FindNext(SR);
-  until x <> 0;
+  if x = 0 then
+    repeat
+      FReferenceTopics.Add(
+        StringReplace(ChangeFileExt(SR.Name,''),'mr_','',[])+'='+path+SR.Name
+      );
+      x := FindNext(SR);
+    until x <> 0;
   FindClose(SR);
 end;
 
@@ -589,9 +658,10 @@ begin
   begin
     FProjectManager.CurrentProject.MaxBackups := gSettings.MaxBackups;  
     FProjectManager.RefreshManager;
-    with FProjectManager.CurrentProject.SourceFiles do
-      if (ProgramFile <> nil) and ProgramFile.Exists then
-        LoadInCodeEditor(ProgramFile.GetFullname);
+    if not FInCommandLineBuild then
+      with FProjectManager.CurrentProject.SourceFiles do
+        if (ProgramFile <> nil) and ProgramFile.Exists then
+          LoadInCodeEditor(ProgramFile.GetFullname);
     // j-a-s-d: Niksa has this in his TODO list
     SetTitleBarCaption('['+FProjectManager.CurrentProject.MidletInfo.Name+']');
     RefreshActions;
@@ -604,7 +674,7 @@ begin
     MessageDlg(_('Could not load project'),mtError,[mbOk],0);
 end;
 
-procedure Tmp3MainForm.Load(AFilename: string);
+procedure Tmp3MainForm.Load(const AFilename: string);
 begin
   case RetrieveFileKind(AFilename) of
   fkGroup:
@@ -789,9 +859,28 @@ begin
 end;
 
 procedure Tmp3MainForm.OnOpenRecentProjectExecute(Sender: TObject);
+var w, wNothing, wDelete, wRename: widestring; fn: string;
 begin
-  if assigned(Sender) and (Sender is TAction) then
-    LoadProject(TAction(Sender).Caption);
+  if not (assigned(Sender) and (Sender is TAction)) then
+    exit;
+  fn := TAction(Sender).Caption;
+  if not FileExists(fn) then begin
+    if gSettings.Recents.Has(fn) then
+      wNothing := _('Nothing');
+      wDelete := _('Delete');
+      wRename := _('Rename');
+      w := InputBox(_('The item does not longer exists.'), _('What do you want to do with it?'), [wNothing, wDelete, wRename], wNothing, false);
+      if w = wDelete then begin
+        gSettings.Recents.Remove(fn);
+        RefreshSubmenus;
+      end else if w = wRename then begin
+        w := InputBox(_('Edit'), _('Filename:'), fn);
+        gSettings.Recents.Replace(fn, w);
+        RefreshSubmenus;
+      end;
+    exit;
+  end;
+  LoadProject(fn);
 end;
 
 procedure Tmp3MainForm.OnGroupManagerClose(Sender: TObject);
@@ -836,23 +925,36 @@ begin
     FMainFrame.NewCodeEditor(sf.GetFullname);
 end;
 
+procedure Tmp3MainForm.actSetEnvironmentVariablesExecute(Sender: TObject);
+begin
+  with TsitEnvironmentVariablesDialog.Create(Self) do
+  try
+    Load;
+    if ShowModal = mrOk then
+      Save;
+  finally
+    Free;
+  end;
+end;
+
 procedure Tmp3MainForm.OnRunningEmulatorFinish(Sender: TObject;
   ExitCode: LongWord);
 begin
   //actRun.Enabled := true;
 end;
 
-function Tmp3MainForm.PrepareCompilerMessagesPanel: boolean;
+procedure Tmp3MainForm.PrepareCompilerMessagesPanel;
 begin
-  try
-    if not FCompilerMessagesPanel.IsReady then begin
-      FCompilerMessagesPanel.Clear;
-      if not actCompilerMessagesPanel.Checked then
-        actCompilerMessagesPanel.Execute;
-    end;
-  finally
-    result := true;
+  if not FCompilerMessagesPanel.IsReady then begin
+    FCompilerMessagesPanel.Clear;
+    if not actCompilerMessagesPanel.Checked then
+      actCompilerMessagesPanel.Execute;
   end;
+end;
+
+procedure Tmp3MainForm.OnActionHintHandler(var HintStr: string; var CanShow: Boolean);
+begin
+  HintStr := StringReplace(HintStr, '&', '', [rfReplaceAll]);
 end;
 
 procedure Tmp3MainForm.OnActiveTabChange(Sender: TObject; TabIndex: Integer);
@@ -877,7 +979,7 @@ begin
   RefreshTranslation;
 end;
 
-procedure Tmp3MainForm.SetTitleBarCaption(ACaption: string = '');
+procedure Tmp3MainForm.SetTitleBarCaption(const ACaption: string = '');
 begin
   if ACaption = '' then
     TitleBar.Caption := PROJECT_NAME + ' ' + PROJECT_VERSION
@@ -1017,7 +1119,7 @@ end;
 procedure Tmp3MainForm.OnDowloadProgress(ADownloadedBytes: integer);
 begin
   Application.ProcessMessages;
-  if GetTickCount > FLastDownloadProgressMessageTickCount + MESSAGE_DELAY then begin
+  if GetTickCount > FLastDownloadProgressMessageTickCount + WEBUPDATE_MESSAGE_DELAY then begin
     FLastDownloadProgressMessageTickCount := GetTickCount;
     UpdateStatusBarText(_('Downloaded:')+' '+IntToStr(ADownloadedBytes)+' bytes');
   end;
@@ -1061,18 +1163,23 @@ begin
   FGroupManager.Visible := actGroupManager.Checked;
 end;
 
-procedure Tmp3MainForm.InternalPerformBuild(var Msg: TMessage);
+procedure Tmp3MainForm.CommandLineBuild(const AFilename: string);
 begin
-  if FGroupManager.HasItemLoaded then
-    actBuildAllProjectsFromHere.Execute
-  else if FProjectManager.HasItemLoaded then
-    actBuild.Execute;
-  WaitUntilBuildFinishes;
-end;
-
-procedure Tmp3MainForm.PerformBuild;
-begin
-  PostMessage(Handle,WM_PERFORMBUILD,0,0);
+  FBackgroundCompilation.CompilerMessagesPanel := nil;
+  FInCommandLineBuild := true;
+  if FileExists(AFilename) then begin
+    case RetrieveFileKind(AFilename) of
+    fkGroup:
+      LoadGroup(AFilename);
+    fkProject:
+      LoadProject(AFilename);
+    end;
+    if FGroupManager.HasItemLoaded then
+      actBuildAllProjectsFromHere.Execute
+    else if FProjectManager.HasItemLoaded then
+      actBuild.Execute;
+    WaitUntilBuildFinishes;
+  end;
 end;
 
 procedure Tmp3MainForm.BuildNextInGroup;
@@ -1149,6 +1256,12 @@ begin
   finally
     Free;
   end;
+end;
+
+procedure Tmp3MainForm.actOpenLibsFolderExecute(Sender: TObject);
+begin
+  if FProjectManager.HasItemLoaded then
+    ShellExecute(0,'open','','',pchar(FProjectManager.CurrentProject.LibrariesDirectory),1);
 end;
 
 procedure Tmp3MainForm.actOpenBinFolderExecute(Sender: TObject);
@@ -1377,6 +1490,32 @@ begin
   end;
 end;
 
+procedure Tmp3MainForm.actSideBarHiddenExecute(Sender: TObject);
+begin
+  FSideBar.Visible := false;
+  actSideBarHidden.Checked := true;
+  actSideBarLeft.Checked := false;
+  actSideBarRight.Checked := false;
+end;
+
+procedure Tmp3MainForm.actSideBarLeftExecute(Sender: TObject);
+begin
+  FSideBar.Align := alLeft;
+  FSideBar.Visible := true;
+  actSideBarHidden.Checked := false;
+  actSideBarLeft.Checked := true;
+  actSideBarRight.Checked := false;
+end;
+
+procedure Tmp3MainForm.actSideBarRightExecute(Sender: TObject);
+begin
+  FSideBar.Align := alRight;
+  FSideBar.Visible := true;
+  actSideBarHidden.Checked := false;
+  actSideBarLeft.Checked := false;
+  actSideBarRight.Checked := true;
+end;
+
 procedure Tmp3MainForm.actUndoExecute(Sender: TObject);
 begin
   if assigned(FMainFrame.CurrentEditor) then
@@ -1501,7 +1640,7 @@ begin
     UpdateStatusBarText(_('ERROR: the file must belong to a project'));
 end;
 
-procedure Tmp3MainForm.HandleTaskTerminated(const task: IOmniTaskControl);
+procedure Tmp3MainForm.OnStopBuilding(Sender: TObject);
 var bSuccess: boolean;
 begin
   bSuccess := FCompilerError = '';
@@ -1509,7 +1648,6 @@ begin
     FCompilerMessagesPanel.ShowCompilerMessage(FCompilerError)
   else
     FCompilerMessagesPanel.ShowCompilerMessage(_('Finished at')+' '+DateTimeToStr(Now));
-  FCompilerTask := nil;
   UpdateStatusBarText;
   FBuilding := false;
   RefreshCompilerActions;
@@ -1520,39 +1658,6 @@ begin
       BuildNextInGroup;
   end else
     FBuildNextInGroup := false;
-end;
-
-procedure Tmp3MainForm.HandleTaskMessage(const task: IOmniTaskControl;
-  const msg: TOmniMessage);
-begin
-  case msg.MsgID of
-    0: FCompilerMessagesPanel.ShowCompilerMessage(msg.MsgData.AsString);
-    1: FCompilerMessagesPanel.SetCompilerProgress(msg.MsgData.AsCardinal);
-  end;
-end;
-
-procedure Tmp3MainForm.ShowCompilerMessage(AMessage: string);
-var msg: TOmniMessage;
-begin
-  if FCompilerTask = nil then
-    FCompilerMessagesPanel.ShowCompilerMessage(AMessage)
-  else begin
-    msg.MsgID := 0;
-    msg.MsgData.AsString := AMessage;
-    FCompilerTask.Comm.Send(msg);
-  end;
-end;
-
-procedure Tmp3MainForm.ShowCompilerProgress(AValue: DWORD);
-var msg: TOmniMessage;
-begin
-  if FCompilerTask = nil then
-    FCompilerMessagesPanel.SetCompilerProgress(AValue)
-  else begin
-    msg.MsgID := 1;
-    msg.MsgData.AsCardinal := AValue;
-    FCompilerTask.Comm.Send(msg);
-  end;
 end;
 
 procedure Tmp3MainForm.OnInstallUpdateClick(Sender: TObject);
@@ -1571,7 +1676,7 @@ begin
   end;
 end;
 
-procedure Tmp3MainForm.UpdateStatusBarText(AText: widestring = ' ');
+procedure Tmp3MainForm.UpdateStatusBarText(const AText: widestring = ' ');
 
   procedure SetRegularStatusBarText;
   begin
@@ -1597,7 +1702,7 @@ begin
   if gCore.WebUpdate.HasInstallationPendingUpdate then begin
     if AText <> ' ' then begin
       SetRegularStatusBarText;
-      Wait(MESSAGE_DELAY);
+      Wait(WEBUPDATE_MESSAGE_DELAY);
     end;
     StatusBarText.OnClick := OnInstallUpdateClick;
     StatusBarText.Cursor := crHandPoint;
@@ -1608,9 +1713,8 @@ begin
     SetRegularStatusBarText;
 end;
 
-procedure Tmp3MainForm.BackgroundBuild(const task: IOmniTask);
+procedure Tmp3MainForm.OnStartBuilding(Sender: TObject);
 begin
-  FCompilerTask := task;
   RefreshCompilerActions;
   Build(FProjectManager.CurrentProject, FCompilerError);
 end;
@@ -1620,7 +1724,8 @@ begin
   if FProjectManager.HasItemLoaded and (not FBuilding) then begin
     FBuildNextInGroup := false;
     FBuilding := true;
-    PrepareCompilerMessagesPanel;
+    if not FInCommandLineBuild then
+      PrepareCompilerMessagesPanel;
     UpdateStatusBarText(_('building...'));
     FCompilerMessagesPanel.ShowCompilerMessage(_('Building')+' '+FProjectManager.CurrentProject.Filename);
     FCompilerMessagesPanel.ShowCompilerMessage(_('Started at')+' '+DateTimeToStr(Now));
@@ -1628,7 +1733,7 @@ begin
       FCompilerMessagesPanel.ShowCompilerMessage(_('Compiler Communication Method')+': WM_COPTYDATA (Win32.Wow64)')
     else
       FCompilerMessagesPanel.ShowCompilerMessage(_('Compiler Communication Method')+': Console Redirection (Win32.Common)');
-    FMessageDispatch.Monitor(CreateTask(BackgroundBuild,'BackgroundBuild')).Run;
+    FBackgroundCompilation.Run;
   end;
 end;
 
@@ -2142,6 +2247,7 @@ procedure Tmp3MainForm.OnSkinExecute(Sender: TObject);
 begin
   if assigned(Sender) and (Sender is TAction) then begin
     TurboUIColorManager.Skin := TAction(Sender).Caption;
+    gSettings.CurrentSkin := TurboUIColorManager.Skin;
     OnlyCheckThisActionInActionList(al_actSkin, TAction(Sender));
   end;
 end;
@@ -2251,6 +2357,12 @@ begin
   FMainFrame.DockRight.Width := gSettings.RightDockWidth;
   if gSettings.WelcomePage <> actWelcomePage.Checked then
     actWelcomePage.Execute;
+  if gSettings.SideBar = SIDEBAR_LEFT then
+    actSideBarLeft.Execute
+  else if gSettings.SideBar = SIDEBAR_RIGHT then
+    actSideBarRight.Execute
+  else
+    actSideBarHidden.Execute;
   if gSettings.GroupManager <> actGroupManager.Checked then
     actGroupManager.Execute;
   if gSettings.ProjectManager <> actProjectManager.Checked then
@@ -2261,8 +2373,14 @@ end;
 
 procedure Tmp3MainForm.WriteSettings;
 begin
-  gSettings.CurrentSkin := TurboUIColorManager.Skin;
   gSettings.WelcomePage := actWelcomePage.Checked;
+  if not FSideBar.Visible then
+    gSettings.SideBar := SIDEBAR_HIDDEN
+  else
+    if FSideBar.Align = alLeft then
+      gSettings.SideBar := SIDEBAR_LEFT
+    else
+      gSettings.SideBar := SIDEBAR_RIGHT;
   gSettings.GroupManager := actGroupManager.Checked;
   gSettings.ProjectManager := actProjectManager.Checked;
   gSettings.GroupManagerPosition := FGroupManager.Parent.Name;

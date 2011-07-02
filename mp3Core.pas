@@ -81,11 +81,8 @@ end;
 procedure Tmp3Core.ParseCommandLine;
 begin
   if SameText(ParamStr(1),BUILD_SWITCH) then begin
-    if FileExists(ParamStr(2)) then begin
-      FMainForm.Load(ParamStr(2));
-      FMainForm.PerformBuild;
-      Terminating := true;
-    end;
+    FMainForm.CommandLineBuild(ParamStr(2));
+    Terminating := true;
   end else if FileExists(ParamStr(1)) then
     FMainForm.Load(ParamStr(1));
 end;

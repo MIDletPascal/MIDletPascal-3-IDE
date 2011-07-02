@@ -27,6 +27,7 @@ type
     FCurrentSkin: string;
     FLibrariesDirectory: string;
     FStubsDirectory: string;
+    FSideBar: string;
     FWelcomePage: boolean;
     FGroupManager: boolean;
     FProjectManager: boolean;
@@ -47,6 +48,7 @@ type
     function GetHelpFile: string;
     function GetCurrentEmulatorCommandLine: string;
     function GetCodeEditorStyles: TsitSynCodeEditorStylesPas;
+    function NormalizeSideBarValue(AValue: string): string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -68,6 +70,7 @@ type
     property CodeEditorStyle: string read FCodeEditorStyle write FCodeEditorStyle;
     property CodeEditorFontName: string read FCodeEditorFontName write FCodeEditorFontName;
     property CodeEditorFontSize: integer read FCodeEditorFontSize write FCodeEditorFontSize;
+    property SideBar: string read FSideBar write FSideBar;
     property WelcomePage: boolean read FWelcomePage write FWelcomePage;
     property GroupManager: boolean read FGroupManager write FGroupManager;
     property ProjectManager: boolean read FProjectManager write FProjectManager;
@@ -166,11 +169,20 @@ begin
     result := FAppPath+Format(HELP_FILE,['en']);
 end;
 
+function Tmp3Settings.NormalizeSideBarValue(AValue: string): string;
+begin
+  result := AValue;
+  if (result <> SIDEBAR_LEFT) and (result <> SIDEBAR_RIGHT) and (result <> SIDEBAR_HIDDEN) then
+    result := CONFIG_IDE_SECTION_SIDEBAR_DEFAULT;
+end;
+
 procedure Tmp3Settings.Load;
 begin
   FCurrentSkin := FIniFile.ReadString(CONFIG_IDE_SECTION,CONFIG_IDE_SECTION_SKIN,DEFAULT_SKIN);
   FWelcomePage := StrToBool(FIniFile.ReadString(CONFIG_IDE_SECTION,
     CONFIG_IDE_SECTION_WELCOMEPAGE,CONFIG_IDE_SECTION_WELCOMEPAGE_DEFAULT));
+  FSideBar := NormalizeSideBarValue(FIniFile.ReadString(CONFIG_IDE_SECTION,
+    CONFIG_IDE_SECTION_SIDEBAR,CONFIG_IDE_SECTION_SIDEBAR_DEFAULT));
   FGroupManager := StrToBool(FIniFile.ReadString(CONFIG_IDE_SECTION,
     CONFIG_IDE_SECTION_GROUPMANAGER,CONFIG_IDE_SECTION_GROUPMANAGER_DEFAULT));
   FProjectManager := StrToBool(FIniFile.ReadString(CONFIG_IDE_SECTION,
@@ -218,6 +230,8 @@ begin
     CONFIG_IDE_SECTION_SKIN,FCurrentSkin);
   FIniFile.WriteString(CONFIG_IDE_SECTION,
     CONFIG_IDE_SECTION_WELCOMEPAGE,BoolToStr(FWelcomePage));
+  FIniFile.WriteString(CONFIG_IDE_SECTION,
+    CONFIG_IDE_SECTION_SIDEBAR,NormalizeSideBarValue(FSideBar));
   FIniFile.WriteString(CONFIG_IDE_SECTION,
     CONFIG_IDE_SECTION_GROUPMANAGER,BoolToStr(FGroupManager));
   FIniFile.WriteString(CONFIG_IDE_SECTION,

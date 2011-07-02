@@ -75,7 +75,7 @@ begin
   Color := clWhite;
   FRecentProjectsSection := Tmp3WelcomePageSection.Create(Self);
   FRecentProjectsSection.Top := SECTIONS_SEPARATION_MARGIN;
-  FRecentProjectsSection.SetSubtitle('Recent Projects');
+  FRecentProjectsSection.SetSubtitle(_('Recent Projects'));
   FRecentProjectsSection.SetMaxItems(MRUINI_MAX);
 end;
 
