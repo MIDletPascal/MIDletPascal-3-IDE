@@ -12,7 +12,7 @@ uses
   Classes, ImgList, Menus, ExtCtrls, Forms, Graphics,
   DosCommand,
   tuiSideBar,
-  sitBaseMainForm, sitCompilerMessagesPanel, sitBackgroundCompilation,
+  sitBaseMainForm, sitBackgroundCompilation, sitCompilerMessagesPanel, sitHtmlQuickHelpPanel,
   mp3ProjectManager, mp3GroupManager, mp3MainFrame;
 
 type
@@ -184,6 +184,7 @@ type
     actSideBarLeft: TAction;
     actSideBarHidden: TAction;
     actSideBarSeparator: TAction;
+    actQuickHelpPanel: TAction;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -270,6 +271,7 @@ type
     procedure actSideBarLeftExecute(Sender: TObject);
     procedure actSideBarRightExecute(Sender: TObject);
     procedure actSideBarHiddenExecute(Sender: TObject);
+    procedure actQuickHelpPanelExecute(Sender: TObject);
   private
     FInCommandLineBuild: boolean;
     FBuilding: boolean;
@@ -282,6 +284,7 @@ type
     FGroupManager: Tmp3GroupManager;
     FProjectManager: Tmp3ProjectManager;
     FSideBar: TtuiSideBar;
+    FQuickHelpPanel: TsitHtmlQuickHelpPanel;
     FCompilerMessagesPanel: TsitCompilerMessagesPanel;
     FBackgroundCompilation: TsitBackgroundCompilation;
     FCompilerError: string;
@@ -347,6 +350,7 @@ type
     procedure OnSkinExecute(Sender: TObject);
     procedure RefreshSkins;
     procedure RefreshStatusBarEditorInfo;
+    procedure RefreshQuickHelpPanel(const AReferenceFile: string);
   public
     procedure Load(const AFilename: string);
     procedure CommandLineBuild(const AFilename: string);
@@ -468,6 +472,9 @@ begin
       FGroupManager.PopupMenu.Items.Add(ti);
     end;
   FGroupManager.ProjectsActions := alGMProjects;
+  // quick help panel
+  FQuickHelpPanel := TsitHtmlQuickHelpPanel.Create(Self);
+  FQuickHelpPanel.Parent := FMainFrame.DockRight;
   // compiler messages
   FCompilerMessagesPanel := TsitCompilerMessagesPanel.Create(Self);
   FCompilerMessagesPanel.Parent := FMainFrame.DockBottom;
@@ -744,7 +751,10 @@ begin
     exit;
   x := GetReferenceTopic(Tmp3CodeEditorFrame(Sender).GetWordAtCursor);
   if x > -1 then
-    ShellExecute(0,'open',pchar(FReferenceTopics.ValueFromIndex[x]),'','',1)
+    if FQuickHelpPanel.Visible then
+      RefreshQuickHelpPanel(FReferenceTopics.ValueFromIndex[x])
+    else
+      ShellExecute(0,'open',pchar(FReferenceTopics.ValueFromIndex[x]),'','',1)
   else
     actOpenHelp.Execute;
 end;
@@ -1420,6 +1430,12 @@ begin
   FProjectManager.Visible := actProjectManager.Checked;
 end;
 
+procedure Tmp3MainForm.actQuickHelpPanelExecute(Sender: TObject);
+begin
+  actQuickHelpPanel.Checked := not actQuickHelpPanel.Checked;
+  FQuickHelpPanel.Visible := actQuickHelpPanel.Checked;
+end;
+
 procedure Tmp3MainForm.actDeleteExecute(Sender: TObject);
 begin
   if assigned(FMainFrame.CurrentEditor) then
@@ -2063,6 +2079,11 @@ begin
     action.Checked := gSettings.Language = FAvailableTranslations[i];
     action.ImageIndex := i + 1;
   end;
+end;
+
+procedure Tmp3MainForm.RefreshQuickHelpPanel(const AReferenceFile: string);
+begin
+  FQuickHelpPanel.RenderFile(AReferenceFile);
 end;
 
 procedure Tmp3MainForm.OnMainFramePopup(Sender: TObject);

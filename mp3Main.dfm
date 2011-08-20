@@ -750,6 +750,11 @@ object mp3MainForm: Tmp3MainForm
       Caption = '&Compiler Messages Panel'
       OnExecute = actCompilerMessagesPanelExecute
     end
+    object actQuickHelpPanel: TAction
+      Caption = 'actQuickHelpPanel'
+      ShortCut = 8304
+      OnExecute = actQuickHelpPanelExecute
+    end
     object actWelcomePage: TAction
       Caption = '&Welcome Page'
       Checked = True
