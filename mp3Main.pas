@@ -299,6 +299,7 @@ type
     procedure OnSetDefaultEmulatorExecute(Sender: TObject);
     procedure OnOpenRecentProjectExecute(Sender: TObject);
     procedure OnClearRecentProjectsExecute(Sender: TObject);
+    procedure OnQuickHelpPanelClose(Sender: TObject);
     procedure OnGroupManagerClose(Sender: TObject);
     procedure OnGroupProjectChange(Sender: TObject);
     procedure OnProjectManagerClose(Sender: TObject);
@@ -475,6 +476,7 @@ begin
   // quick help panel
   FQuickHelpPanel := TsitHtmlQuickHelpPanel.Create(Self);
   FQuickHelpPanel.Parent := FMainFrame.DockRight;
+  FQuickHelpPanel.OnClose := OnQuickHelpPanelClose;
   // compiler messages
   FCompilerMessagesPanel := TsitCompilerMessagesPanel.Create(Self);
   FCompilerMessagesPanel.Parent := FMainFrame.DockBottom;
@@ -891,6 +893,11 @@ begin
     exit;
   end;
   LoadProject(fn);
+end;
+
+procedure Tmp3MainForm.OnQuickHelpPanelClose(Sender: TObject);
+begin
+  actQuickHelpPanel.Checked := false;
 end;
 
 procedure Tmp3MainForm.OnGroupManagerClose(Sender: TObject);
