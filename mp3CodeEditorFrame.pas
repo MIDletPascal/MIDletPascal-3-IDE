@@ -23,7 +23,7 @@ uses
   gnugettext,
   tuiFindDialog, tuiReplaceDialog, tuiControls,
   sitEditorFrame, sitSynRsRuler, sitSynCodeEditorStyle, sitSynCodeEditorStylePas,
-  mp3FileKind, mp3Consts, mp3Settings;
+  mp3ClassExplorerFrame, mp3FileKind, mp3Consts, mp3Settings;
 
 type
   Tmp3CodeEditorFrame = class(TsitEditorFrame)
@@ -32,6 +32,7 @@ type
     FCodeTab: TtuiTabItem;
     FPreprocessTab: TtuiTabItem;
     FHistoryTab: TtuiTabItem;
+    FClassTab: TtuiTabItem;
     FSynEdit: TSynEdit;
     FPreprocessSynEdit: TSynEdit;
     FHistoryContentsSynEdit: TSynEdit;
@@ -39,6 +40,7 @@ type
     FOnCaretMove: TNotifyEvent;
     FOnPreprocess: TNotifyEvent;
     FOnHistory: TNotifyEvent;
+    FOnBrowseClassFile: TNotifyEvent;
     FOnOpenFileAtCursor: TNotifyEvent;
     FOnGetHelpOnWord: TNotifyEvent;
     FOnRollback: TNotifyEvent;
@@ -74,7 +76,8 @@ type
     FHistoryRollbackButton: TtuiMenuItem;
     FHistorySendToBufferButton: TtuiMenuItem;
     FRuler: TsitSynRsRuler;
-    FTabControlText : TtuiLabel;
+    FTabControlText: TtuiLabel;
+    FClassExplorerFrame: Tmp3ClassExplorerFrame;
     procedure GridDrawCell(Sender: TObject; ACol, ARow: Integer;
       Rect: TRect; State: TGridDrawState);
     procedure GridTopLeftChanged(Sender: TObject);
@@ -87,6 +90,7 @@ type
     procedure SetContent(const Value: string);
     procedure OnPreprocessClick(Sender: TObject);
     procedure OnHistoryClick(Sender: TObject);
+    procedure OnBrowseClassFileClick(Sender: TObject);
     procedure WhenResizing(Sender: TObject);
     procedure Diff;
     function DoSearchReplaceText(ABackwards, AReplace: boolean): boolean;
@@ -118,6 +122,7 @@ type
     function FindPrevious: boolean;
     procedure SetPreprocessedCode(ACode: string);
     procedure SetHistoricalItems(AItems: string);
+    procedure SetClassFile(AFilename: string);
     procedure SetColorSpeedSetting(AColorSetting: string);
     procedure SetPreprocessTabVisibility(AValue: boolean);
     procedure SetHistoryTabVisibility(AValue: boolean);
@@ -134,6 +139,8 @@ type
       read FOnPreprocess write FOnPreprocess;
     property OnHistory: TNotifyEvent
       read FOnHistory write FOnHistory;
+    property OnBrowseClassFile: TNotifyEvent
+      read FOnBrowseClassFile write FOnBrowseClassFile;
     property OnOpenFileAtCursor: TNotifyEvent
       read FOnOpenFileAtCursor write FOnOpenFileAtCursor;
     property OnGetHelpOnWord: TNotifyEvent
@@ -337,6 +344,15 @@ procedure Tmp3CodeEditorFrame.AfterConstruction;
     InitDiffTab;
   end;
 
+  procedure InitClassTab;
+  begin
+    FClassTab := FTabControl.Add('.class');
+    FClassTab.OnClick := OnBrowseClassFileClick;
+    FClassExplorerFrame := Tmp3ClassExplorerFrame.Create(Self);
+    FClassExplorerFrame.Parent := FTabControl.Pages[3];
+    FClassExplorerFrame.Align := alClient;
+  end;
+
   procedure InitTabControlText;
   begin
     FTabControl.Items.Add(TtuiRightAlignSpacerItem.Create(Self));
@@ -357,6 +373,7 @@ begin
   InitCodeTab;
   InitPreprocessTab;
   InitHistoryTab;
+  InitClassTab;
   InitTabControlText;
   SetColorSpeedSetting(gSettings.CodeEditorStyle);
   FCodeTab.Click;
@@ -457,6 +474,12 @@ begin
         if assigned(FOnGetHelpOnWord) then
           FOnGetHelpOnWord(Self);
     end;
+end;
+
+procedure Tmp3CodeEditorFrame.OnBrowseClassFileClick(Sender: TObject);
+begin
+  if assigned(FOnBrowseClassFile) then
+    FOnBrowseClassFile(Self);
 end;
 
 procedure Tmp3CodeEditorFrame.OnHistoryClick(Sender: TObject);
@@ -770,6 +793,11 @@ end;
 function Tmp3CodeEditorFrame.FindPrevious: boolean;
 begin
   result := DoSearchReplaceText(true,false);
+end;
+
+procedure Tmp3CodeEditorFrame.SetClassFile(AFilename: string);
+begin
+  FClassExplorerFrame.OpenClassFile(AFilename);
 end;
 
 procedure Tmp3CodeEditorFrame.SetColorSpeedSetting(AColorSetting: string);

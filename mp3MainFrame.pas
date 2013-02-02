@@ -21,6 +21,7 @@ type
     FWelcomePage: Tmp3WelcomePageFrame;
     FOnCodeEditorPreprocess: TNotifyEvent;
     FOnCodeEditorHistory: TNotifyEvent;
+    FOnCodeEditorBrowseClassFile: TNotifyEvent;
     FOnCodeEditorOpenFileAtCursor: TNotifyEvent;
     FOnCodeEditorGetHelpOnWord: TNotifyEvent;
     FOnCodeEditorRollback: TNotifyEvent;
@@ -33,6 +34,7 @@ type
     procedure OnCodeSendToBuffer(Sender: TObject);
     procedure OnCodeHistory(Sender: TObject);
     procedure OnCodePreprocess(Sender: TObject);
+    procedure OnCodeBrowseClassFile(Sender: TObject);
     function NewEditor(AKind: TsitEditorKind): TsitEditorFrame;
     procedure InitWelcomePage;
   public
@@ -52,6 +54,8 @@ type
       read FOnCodeEditorPreprocess write FOnCodeEditorPreprocess;
     property OnCodeEditorHistory: TNotifyEvent
       read FOnCodeEditorHistory write FOnCodeEditorHistory;
+    property OnCodeEditorBrowseClassFile: TNotifyEvent
+      read FOnCodeEditorBrowseClassFile write FOnCodeEditorBrowseClassFile; 
     property OnCodeEditorOpenFileAtCursor: TNotifyEvent
       read FOnCodeEditorOpenFileAtCursor write FOnCodeEditorOpenFileAtCursor;
     property OnCodeEditorGetHelpOnWord: TNotifyEvent
@@ -127,6 +131,7 @@ begin
   codeEditor.OnOpenFileAtCursor := OnCodeOpenFileAtCursor;
   codeEditor.OnGetHelpOnWord := OnCodeGetHelpOnWord;
   codeEditor.OnHistory := OnCodeHistory;
+  codeEditor.OnBrowseClassFile := OnCodeBrowseClassFile;
   codeEditor.OnRollback := OnCodeRollback;
   codeEditor.OnSendToBuffer := OnCodeSendToBuffer;
   codeEditor.SetPreprocessTabVisibility(AShowPreprocessTab);
@@ -192,6 +197,12 @@ procedure Tmp3MainFrame.OnCodeGetHelpOnWord(Sender: TObject);
 begin
   if assigned(FOnCodeEditorGetHelpOnWord) then
     FOnCodeEditorGetHelpOnWord(Sender);
+end;
+
+procedure Tmp3MainFrame.OnCodeBrowseClassFile(Sender: TObject);
+begin
+  if assigned(FOnCodeEditorBrowseClassFile) then
+    FOnCodeEditorBrowseClassFile(Sender);
 end;
 
 procedure Tmp3MainFrame.OnCodeHistory(Sender: TObject);

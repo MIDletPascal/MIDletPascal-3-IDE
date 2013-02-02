@@ -313,6 +313,7 @@ type
     procedure OnCodeEditorCaretMove(Sender: TObject);
     procedure OnCodeEditorPreprocess(Sender: TObject);
     procedure OnCodeEditorHistory(Sender: TObject);
+    procedure OnCodeEditorBrowseClassFile(Sender: TObject);
     procedure OnCodeEditorOpenFileAtCursor(Sender: TObject);
     procedure OnCodeEditorGetHelpOnWord(Sender: TObject);
     procedure OnCodeEditorRollback(Sender: TObject);
@@ -426,6 +427,7 @@ begin
   FMainFrame.OnCodeEditorCaretMove := OnCodeEditorCaretMove;
   FMainFrame.OnCodeEditorPreprocess := OnCodeEditorPreprocess;
   FMainFrame.OnCodeEditorHistory := OnCodeEditorHistory;
+  FMainFrame.OnCodeEditorBrowseClassFile := OnCodeEditorBrowseClassFile;
   FMainFrame.OnCodeEditorOpenFileAtCursor := OnCodeEditorOpenFileAtCursor;
   FMainFrame.OnCodeEditorGetHelpOnWord := OnCodeEditorGetHelpOnWord;
   FMainFrame.OnCodeEditorRollback := OnCodeEditorRollback;
@@ -738,6 +740,23 @@ begin
   finally
     st.Free;
   end;
+end;
+
+procedure Tmp3MainForm.OnCodeEditorBrowseClassFile(Sender: TObject);
+var AClassFilename: string; AProject: Tmp3Project; ASourceFile: Tmp3SourceFile;
+begin
+  AProject := FProjectManager.CurrentProject;
+  if not assigned(AProject) then
+    exit;
+  ASourceFile := AProject.SourceFiles.GetSourceFileByName(
+    FMainFrame.CurrentEditor.Filename);
+  if not assigned(ASourceFile) then
+    exit;
+  AClassFilename := AProject.GetClassFileFor(ASourceFile);
+  if not FileExists(AClassFilename) then
+    ShowError(_('Can''t find the class file. Please compile first.'))
+  else
+    Tmp3CodeEditorFrame(Sender).SetClassFile(AClassFilename);
 end;
 
 procedure Tmp3MainForm.OnCodeEditorCaretMove(Sender: TObject);
